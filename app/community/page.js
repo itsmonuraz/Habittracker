@@ -124,8 +124,8 @@ export default function CommunityPage() {
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5]">Community Habits - {getCurrentMonthYear()}</h1>
           <Link href="/">
-            <button className="!text-[#808383] dark:text-[#13343b] border-none rounded-lg py-2 px-4 !font-xs cursor-pointer transition-all duration-250  flex items-center gap-2">
-              <span>← Back to My Habits</span>
+            <button className="underline text-xs !text-[#808383] dark:text-[#13343b] border-none rounded-lg py-2 px-4 !font-xs cursor-pointer transition-all duration-250  flex items-center gap-2">
+              <span>back</span>
             </button>
           </Link>
         </div>

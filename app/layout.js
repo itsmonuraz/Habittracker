@@ -1,14 +1,10 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Serif } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const ibmPlexSerif = IBM_Plex_Serif({
+  weight: ['400', '500', '600', '700'],
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-ibm-plex-serif",
 });
 
 export const metadata = {
@@ -20,7 +16,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${ibmPlexSerif.variable} antialiased font-serif`}
       >
         {children}
       </body>
