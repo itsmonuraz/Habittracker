@@ -150,11 +150,14 @@ export default function CommunityPage() {
   return (
     <div className="flex flex-col items-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
       {/* Header */}
-      <div className="w-full max-w-6xl mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5]">Community Habits - {getCurrentMonthYear()}</h1>
+      <div className="w-full max-w-6xl mb-6 md:mb-8">
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <h1 className="text-lg md:text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] flex-1">
+            <span className="hidden md:inline">Community Habits - {getCurrentMonthYear()}</span>
+            <span className="md:hidden">Community - {getCurrentMonthYear()}</span>
+          </h1>
           <Link href="/">
-            <button className="underline text-xs !text-[#808383] dark:text-[#13343b] border-none rounded-lg py-2 px-4 !font-xs cursor-pointer transition-all duration-250  flex items-center gap-2">
+            <button className="text-sm md:text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] border-none rounded-lg py-2 px-3 md:px-4 cursor-pointer transition-all duration-250 flex items-center gap-2 whitespace-nowrap">
               <span>back</span>
             </button>
           </Link>

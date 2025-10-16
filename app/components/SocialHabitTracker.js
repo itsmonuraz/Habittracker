@@ -304,17 +304,33 @@ export default function SocialHabitTracker() {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Navigation - Below Table */}
+        <div className="md:hidden mt-6 flex justify-between items-center px-2">
+          <Link href="/settings">
+            <div className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
+              {currentUser}
+            </div>
+          </Link>
+
+          <Link href="/community">
+            <div className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
+              Community
+            </div>
+          </Link>
+        </div>
       </div>
 
+      {/* Desktop Navigation - Fixed Position */}
       <Link href="/settings">
-        <div className="fixed bottom-6 left-6 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
+        <div className="hidden md:block fixed bottom-6 left-6 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
           {currentUser}
         </div>
       </Link>
 
       <Link href="/community">
         <button 
-          className="fixed top-6 right-6 border-none rounded-lg p-3 font-medium cursor-pointer transition-all duration-250 hover:-translate-y-0.5 flex items-center justify-center"
+          className="hidden md:flex fixed top-6 right-6 border-none rounded-lg p-3 font-medium cursor-pointer transition-all duration-250 hover:-translate-y-0.5 items-center justify-center"
         >
           <Image 
             src="/social2.svg" 

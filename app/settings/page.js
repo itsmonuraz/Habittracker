@@ -47,41 +47,41 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
-      <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-8 w-full max-w-[600px]">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
+      <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-4 md:p-8 w-full max-w-[600px]">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5]">Settings</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5]">Settings</h1>
           <Link href="/">
-            <button className=" text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
+            <button className="text-sm md:text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
              back →
             </button>
           </Link>
         </div>
 
         {/* User Info Section */}
-        <div className="mb-8 pb-6 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)]">
-          <h2 className="text-sm font-semibold text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-3 uppercase tracking-wide">Profile</h2>
+        <div className="mb-6 md:mb-8 pb-4 md:pb-6 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)]">
+          <h2 className="text-xs md:text-sm font-semibold text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-3 uppercase tracking-wide">Profile</h2>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-lg font-semibold text-[#13343b] dark:text-[#f5f5f5]">{currentUser}</p>
+              <p className="text-base md:text-lg font-semibold text-[#13343b] dark:text-[#f5f5f5]">{currentUser}</p>
               <p className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">Active user</p>
             </div>
           </div>
         </div>
 
         {/* Theme Section */}
-        <div className="mb-8 pb-6 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)]">
-          <h2 className="text-sm font-semibold text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-3 uppercase tracking-wide">Appearance</h2>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-base font-medium text-[#13343b] dark:text-[#f5f5f5]">Theme</p>
-              <p className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">Choose your preferred theme</p>
+        <div className="mb-6 md:mb-8 pb-4 md:pb-6 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)]">
+          <h2 className="text-xs md:text-sm font-semibold text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-3 uppercase tracking-wide">Appearance</h2>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <p className="text-sm md:text-base font-medium text-[#13343b] dark:text-[#f5f5f5]">Theme</p>
+              <p className="text-xs md:text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">Choose your preferred theme</p>
             </div>
             <select 
               value={theme}
               onChange={(e) => handleThemeChange(e.target.value)}
-              className="px-4 py-2 rounded-lg border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] bg-[#fffffe] dark:bg-[#1f2121] text-[#13343b] dark:text-[#f5f5f5] text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#13343b] dark:focus:ring-[#f5f5f5]"
+              className="px-3 md:px-4 py-2 rounded-lg border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] bg-[#fffffe] dark:bg-[#1f2121] text-[#13343b] dark:text-[#f5f5f5] text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#13343b] dark:focus:ring-[#f5f5f5]"
             >
               <option value="light">Light</option>
               <option value="dark">Dark</option>
@@ -91,12 +91,12 @@ export default function SettingsPage() {
         </div>
 
         {/* Notifications Section */}
-        <div className="mb-8 pb-6 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)]">
-          <h2 className="text-sm font-semibold text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-3 uppercase tracking-wide">Notifications</h2>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-base font-medium text-[#13343b] dark:text-[#f5f5f5]">Daily Reminders</p>
-              <p className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">Get reminded to track your habits</p>
+        <div className="mb-6 md:mb-8 pb-4 md:pb-6 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)]">
+          <h2 className="text-xs md:text-sm font-semibold text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-3 uppercase tracking-wide">Notifications</h2>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <p className="text-sm md:text-base font-medium text-[#13343b] dark:text-[#f5f5f5]">Daily Reminders</p>
+              <p className="text-xs md:text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">Get reminded to track your habits</p>
             </div>
             <button
               onClick={() => setNotifications(!notifications)}
@@ -115,12 +115,12 @@ export default function SettingsPage() {
 
         {/* Data Section */}
         <div>
-          <h2 className="text-sm font-semibold text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-3 uppercase tracking-wide">Data</h2>
+          <h2 className="text-xs md:text-sm font-semibold text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-3 uppercase tracking-wide">Data</h2>
           <div className="space-y-3">
-            <button className="w-full text-left px-4 py-3 rounded-lg border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] bg-[#fffffe] dark:bg-[#262828] text-[#13343b] dark:text-[#f5f5f5] text-sm hover:bg-gray-50 dark:hover:bg-[#1f2121] transition-colors">
+            <button className="w-full text-left px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] bg-[#fffffe] dark:bg-[#262828] text-[#13343b] dark:text-[#f5f5f5] text-sm hover:bg-gray-50 dark:hover:bg-[#1f2121] transition-colors">
               Export Data
             </button>
-            <button className="w-full text-left px-4 py-3 rounded-lg border border-red-200 dark:border-red-900 bg-[#fffffe] dark:bg-[#262828] text-red-600 dark:text-red-400 text-sm hover:bg-red-50 dark:hover:bg-red-950 transition-colors">
+            <button className="w-full text-left px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-red-200 dark:border-red-900 bg-[#fffffe] dark:bg-[#262828] text-red-600 dark:text-red-400 text-sm hover:bg-red-50 dark:hover:bg-red-950 transition-colors">
               Clear All Data
             </button>
           </div>
