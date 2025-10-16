@@ -189,7 +189,8 @@ export default function SocialHabitTracker() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Desktop Table */}
+        <div className="overflow-x-auto hidden md:block">
           <table className="w-full border-collapse min-w-max">
             <thead>
               <tr>
@@ -240,6 +241,66 @@ export default function SocialHabitTracker() {
                   })}
                 </tr>
               ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile Table - Vertical Layout */}
+        <div className="overflow-x-auto md:hidden">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr>
+                <th className="text-left font-semibold text-xs py-2 px-2 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] sticky left-0 z-30 bg-[#fffffe] dark:bg-[#262828] min-w-[50px]">
+                  Day
+                </th>
+                {user.habits.map((habit, index) => (
+                  <th key={index} className="border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] min-w-[28px] w-7 sticky top-0 z-10 bg-[#fffffe] dark:bg-[#262828] py-2">
+                    <div className="flex items-center justify-center h-full">
+                      <span className="text-[10px] text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium whitespace-nowrap" style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}>
+                        {habit}
+                      </span>
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {dateRange.map((date, dateIndex) => {
+                const dayNumber = formatDateHeader(date);
+                return (
+                  <tr key={dateIndex}>
+                    <td className="text-left text-xs py-1 px-2 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 font-medium">
+                      {dayNumber}
+                    </td>
+                    {user.habits.map((habit, habitIndex) => {
+                      const isCompleted = isHabitCompleted(viewingUser, habit, date);
+                      const isFuture = isFutureDate(date);
+                      const isPast = isPastDate(date);
+                      const isTodayDate = isToday(date);
+                      const isDisabled = isViewingOthers || isFuture || isPast;
+                      const cellId = `cell-mobile-${viewingUser}-${dateIndex}-${habitIndex}`;
+                      
+                      return (
+                        <td 
+                          key={habitIndex}
+                          id={cellId}
+                          className={`text-center p-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] w-7 min-w-[28px] h-[28px] transition-all duration-200 relative
+                            ${!isDisabled ? 'cursor-pointer' : 'cursor-not-allowed'}
+                          `}
+                          onClick={() => !isDisabled && toggleHabitCompletion(habit, date)}
+                        >
+                          <div className={`w-full h-full rounded transition-all duration-200 relative
+                            ${isCompleted ? 'bg-green-700 dark:bg-green-800' : isFuture ? 'bg-black/10' : 'bg-transparent'}
+                            ${!isDisabled ? 'hover:scale-95 hover:shadow-inner hover:bg-gray-100 dark:hover:bg-gray-700' : ''}
+                            ${isPast && !isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/10 after:pointer-events-none after:rounded' : ''}
+                            ${isPast && isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/20 after:pointer-events-none after:rounded' : ''}
+                          `} />
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
