@@ -23,3 +23,15 @@ body {
   color: var(--foreground);
   font-family: var(--font-ibm-plex-serif), serif;
 }
+
+/* Ensure all interactive elements have pointer cursor */
+button,
+a,
+[role="button"],
+.cursor-pointer,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+select {
+  cursor: pointer !important;
+}

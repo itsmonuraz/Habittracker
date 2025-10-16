@@ -245,9 +245,11 @@ export default function SocialHabitTracker() {
         </div>
       </div>
 
-      <div className="fixed bottom-6 left-6 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium">
-        {currentUser}
-      </div>
+      <Link href="/settings">
+        <div className="fixed bottom-6 left-6 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors underline">
+          {currentUser}
+        </div>
+      </Link>
 
       <Link href="/community">
         <button 
