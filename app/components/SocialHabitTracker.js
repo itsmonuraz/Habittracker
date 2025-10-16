@@ -35,7 +35,7 @@ const userData = {
       "2025-10-04": ["Practice guitar", "Journal writing"],
       "2025-10-05": ["5K run", "Practice guitar", "Meal prep", "Call family"],
       "2025-10-06": ["Practice guitar", "Journal writing"],
-      "2025-10-07": ["5K run", "Practice guitar"],
+      "2025-10-07": ["5K run", "Practice guitar", "Meal prep"],
       "2025-10-08": ["5K run", "Practice guitar", "Meal prep", "Journal writing"],
       "2025-10-09": ["5K run", "Practice guitar", "Journal writing"],
       "2025-10-10": ["Practice guitar", "Call family", "Journal writing"],
@@ -246,7 +246,7 @@ export default function SocialHabitTracker() {
       </div>
 
       <Link href="/settings">
-        <div className="fixed bottom-6 left-6 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors underline">
+        <div className="fixed bottom-6 left-6 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
           {currentUser}
         </div>
       </Link>
