@@ -157,11 +157,36 @@ export default function SocialHabitTracker() {
     return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
   };
 
+  // Calculate completion stats for passed days only
+  const getCompletionStats = () => {
+    let totalCompleted = 0;
+    let totalPossible = 0;
+    
+    // Only count days that have passed (up to and including today)
+    const passedDates = dateRange.filter(date => date <= currentDate);
+    
+    passedDates.forEach(date => {
+      user.habits.forEach(habit => {
+        totalPossible++;
+        if (isHabitCompleted(viewingUser, habit, date)) {
+          totalCompleted++;
+        }
+      });
+    });
+    
+    return { completed: totalCompleted, total: totalPossible };
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 relative bg-[#fcfcf9] dark:bg-[#1f2121]">
       <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-4 w-full max-w-[1100px] overflow-x-auto">
-        <div className="text-left pl-2 mb-4 text-sm font-medium text-[#13343b] dark:text-[#f5f5f5]">
-          {getCurrentMonthYear()}
+        <div className="flex justify-between items-center pl-2 pr-2 mb-4">
+          <div className="text-sm font-medium text-[#13343b] dark:text-[#f5f5f5]">
+            {getCurrentMonthYear()}
+          </div>
+          <div className="text-sm font-medium text-[#13343b] dark:text-[#f5f5f5]">
+            {getCompletionStats().completed}/{getCompletionStats().total}
+          </div>
         </div>
 
         <div className="overflow-x-auto">

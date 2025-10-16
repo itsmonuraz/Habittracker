@@ -126,6 +126,27 @@ export default function CommunityPage() {
     return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
   };
 
+  // Calculate completion stats for a user (passed days only)
+  const getCompletionStats = (userName) => {
+    let totalCompleted = 0;
+    let totalPossible = 0;
+    
+    const user = userData[userName];
+    // Only count days that have passed (up to and including today)
+    const passedDates = dateRange.filter(date => date <= currentDate);
+    
+    passedDates.forEach(date => {
+      user.habits.forEach(habit => {
+        totalPossible++;
+        if (isHabitCompleted(userName, habit, date)) {
+          totalCompleted++;
+        }
+      });
+    });
+    
+    return { completed: totalCompleted, total: totalPossible };
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
       {/* Header */}
@@ -144,10 +165,16 @@ export default function CommunityPage() {
       <div className="w-full max-w-6xl space-y-8">
         {Object.keys(userData).map((userName) => {
           const user = userData[userName];
+          const stats = getCompletionStats(userName);
           
           return (
             <div key={userName} className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-4 w-full overflow-x-auto">
-              <h2 className="text-sm text-right font-semibold text-[#13343b] dark:text-[#f5f5f5] mb-4">{userName}</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-sm font-semibold text-[#13343b] dark:text-[#f5f5f5]">{userName}</h2>
+                <div className="text-sm font-medium text-[#13343b] dark:text-[#f5f5f5]">
+                  {stats.completed}/{stats.total}
+                </div>
+              </div>
               
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse min-w-max">
