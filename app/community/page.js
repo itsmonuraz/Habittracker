@@ -78,7 +78,16 @@ const generateDateRange = () => {
   return dates;
 };
 
-const currentDate = "2025-10-15";
+// Get current date dynamically
+const getCurrentDate = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+  const day = now.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const currentDate = getCurrentDate();
 const dateRange = generateDateRange();
 
 export default function CommunityPage() {
