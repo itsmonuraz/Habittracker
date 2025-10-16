@@ -1,12 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function SettingsPage() {
   const [currentUser] = useState("@alex");
-  const [theme, setTheme] = useState("system");
+  const [theme, setTheme] = useState("light");
   const [notifications, setNotifications] = useState(true);
+
+  // Initialize theme from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    applyTheme(savedTheme);
+  }, []);
+
+  // Apply theme to document
+  const applyTheme = (newTheme) => {
+    const root = document.documentElement;
+    
+    console.log('Applying theme:', newTheme);
+    console.log('Current classes before:', root.className);
+    
+    if (newTheme === 'dark') {
+      root.classList.add('dark');
+    } else if (newTheme === 'light') {
+      root.classList.remove('dark');
+    } else {
+      // System preference
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    }
+    
+    console.log('Current classes after:', root.className);
+  };
+
+  // Handle theme change
+  const handleThemeChange = (newTheme) => {
+    console.log('Theme change requested:', newTheme);
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    applyTheme(newTheme);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
@@ -42,7 +80,7 @@ export default function SettingsPage() {
             </div>
             <select 
               value={theme}
-              onChange={(e) => setTheme(e.target.value)}
+              onChange={(e) => handleThemeChange(e.target.value)}
               className="px-4 py-2 rounded-lg border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] bg-[#fffffe] dark:bg-[#1f2121] text-[#13343b] dark:text-[#f5f5f5] text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#13343b] dark:focus:ring-[#f5f5f5]"
             >
               <option value="light">Light</option>
