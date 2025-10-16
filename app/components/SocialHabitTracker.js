@@ -251,7 +251,7 @@ export default function SocialHabitTracker() {
 
       <Link href="/community">
         <button 
-          className="fixed top-6 right-6 border-none rounded-lg p-3 font-medium cursor-pointer transition-all duration-250 hover:-translate-y-0.5 active:bg-[#1a6873] dark:active:bg-[#2996a1] active:translate-y-0 flex items-center justify-center"
+          className="fixed top-6 right-6 border-none rounded-lg p-3 font-medium cursor-pointer transition-all duration-250 hover:-translate-y-0.5 flex items-center justify-center"
         >
           <Image 
             src="/social2.svg" 
