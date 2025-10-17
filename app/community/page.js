@@ -157,7 +157,7 @@ export default function CommunityPage() {
             <span className="md:hidden">Community - {getCurrentMonthYear()}</span>
           </h1>
           <Link href="/">
-            <button className="text-sm md:text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] border-none rounded-lg py-2 px-3 md:px-4 cursor-pointer transition-all duration-250 flex items-center gap-2 whitespace-nowrap">
+            <button className="underline text-sm md:text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] border-none rounded-lg py-2 px-3 md:px-4 cursor-pointer transition-all duration-250 flex items-center gap-2 whitespace-nowrap">
               <span>back</span>
             </button>
           </Link>
