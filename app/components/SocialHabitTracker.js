@@ -90,10 +90,31 @@ const getCurrentDate = () => {
 const currentDate = getCurrentDate();
 const dateRange = generateDateRange();
 
+// Motivational reminders array
+const motivationalReminders = [
+  "When you feel unmotivated, don’t stop to rest and wait for energy to return. Instead, read articles, review your notes, or watch inspiring videos. These small actions can reignite your motivation and help you get back on track.",
+  "The brain gets more dopamine from planning than doing. That's why people have multiple business ideas but zero businesses.",
+];
+
 export default function SocialHabitTracker() {
   const [currentUser] = useState("@alex");
   const [viewingUser, setViewingUser] = useState("@alex");
   const [userDataState, setUserDataState] = useState(userData);
+  
+  // State for current motivational reminder
+  const [currentReminder, setCurrentReminder] = useState(() => {
+    return motivationalReminders[Math.floor(Math.random() * motivationalReminders.length)];
+  });
+  
+  // Change reminder every 60 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const randomIndex = Math.floor(Math.random() * motivationalReminders.length);
+      setCurrentReminder(motivationalReminders[randomIndex]);
+    }, 60000); // 60000ms = 1 minute
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // Format date for display - just return the day number
   const formatDateHeader = (dateStr) => {
@@ -319,6 +340,13 @@ export default function SocialHabitTracker() {
             </div>
           </Link>
         </div>
+      </div>
+
+      {/* Motivational Reminder - Outside Table Block */}
+      <div className="mt-10 text-center">
+        <p className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.8)] italic transition-all duration-500">
+          {currentReminder}
+        </p>
       </div>
 
       {/* Desktop Navigation - Fixed Position */}

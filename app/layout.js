@@ -10,6 +10,9 @@ const ibmPlexSerif = IBM_Plex_Serif({
 export const metadata = {
   title: "Social Habit Tracker",
   description: "Track your habits and view others' progress",
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export default function RootLayout({ children }) {
