@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function SettingsPage() {
-  const [currentUser] = useState("@alex");
+  const [currentUser] = useState("@camino");
   const [theme, setTheme] = useState("light");
   const [notifications, setNotifications] = useState(true);
 

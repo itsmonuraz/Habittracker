@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 // User data stored in memory (same as main component)
 const userData = {
-  "@alex": {
+  "@camino": {
     habits: ["Morning Meditation", "Exercise", "Read 30min", "Drink 8 glasses water", "No social media before 6pm"],
     completions: {
       "2025-10-01": ["Morning Meditation", "Exercise", "Read 30min"],

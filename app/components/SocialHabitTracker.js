@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 // User data stored in memory
 const userData = {
-  "@alex": {
+  "@camino": {
     habits: ["Morning Meditation", "Exercise", "Read 30min", "Drink 8 glasses water", "No social media before 6pm"],
     completions: {
       "2025-10-01": ["Morning Meditation", "Exercise", "Read 30min"],
@@ -97,8 +97,8 @@ const motivationalReminders = [
 ];
 
 export default function SocialHabitTracker() {
-  const [currentUser] = useState("@alex");
-  const [viewingUser, setViewingUser] = useState("@alex");
+  const [currentUser] = useState("@camino");
+  const [viewingUser, setViewingUser] = useState("@camino");
   const [userDataState, setUserDataState] = useState(userData);
   
   // State for current motivational reminder - start with first one to avoid hydration mismatch
