@@ -4,9 +4,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Remove basePath and assetPrefix for custom domain
-  // basePath: '/HabbitTracker',
-  // assetPrefix: '/HabbitTracker/',
+  trailingSlash: true,
 };
 
 export default nextConfig;
