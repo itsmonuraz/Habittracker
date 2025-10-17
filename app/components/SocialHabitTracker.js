@@ -92,8 +92,8 @@ const dateRange = generateDateRange();
 
 // Motivational reminders array
 const motivationalReminders = [
-  "When you feel unmotivated, don’t stop to rest and wait for energy to return. Instead, read articles, review your notes, or watch inspiring videos. These small actions can reignite your motivation and help you get back on track.",
-  "The brain gets more dopamine from planning than doing. That's why people have multiple business ideas but zero businesses.",
+  "When you feel unmotivated, don't stop to rest and wait for energy to return. Instead, read articles, review your notes, or watch inspiring videos. These small actions can reignite your motivation and help you get back on track.",
+  "The brain gets more dopamine from planning than doing.\nThat's why people have multiple business ideas but zero businesses.",
 ];
 
 export default function SocialHabitTracker() {
@@ -101,20 +101,28 @@ export default function SocialHabitTracker() {
   const [viewingUser, setViewingUser] = useState("@alex");
   const [userDataState, setUserDataState] = useState(userData);
   
-  // State for current motivational reminder
-  const [currentReminder, setCurrentReminder] = useState(() => {
-    return motivationalReminders[Math.floor(Math.random() * motivationalReminders.length)];
-  });
+  // State for current motivational reminder - start with first one to avoid hydration mismatch
+  const [currentReminder, setCurrentReminder] = useState(motivationalReminders[0]);
+  const [isClient, setIsClient] = useState(false);
+  
+  // Set random reminder on client mount
+  useEffect(() => {
+    setIsClient(true);
+    const randomIndex = Math.floor(Math.random() * motivationalReminders.length);
+    setCurrentReminder(motivationalReminders[randomIndex]);
+  }, []);
   
   // Change reminder every 60 seconds
   useEffect(() => {
+    if (!isClient) return;
+    
     const interval = setInterval(() => {
       const randomIndex = Math.floor(Math.random() * motivationalReminders.length);
       setCurrentReminder(motivationalReminders[randomIndex]);
     }, 60000); // 60000ms = 1 minute
     
     return () => clearInterval(interval);
-  }, []);
+  }, [isClient]);
 
   // Format date for display - just return the day number
   const formatDateHeader = (dateStr) => {
@@ -343,8 +351,8 @@ export default function SocialHabitTracker() {
       </div>
 
       {/* Motivational Reminder - Outside Table Block */}
-      <div className="mt-10 text-center">
-        <p className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.8)] italic transition-all duration-500">
+      <div className="mt-10 text-center max-w-2xl">
+        <p className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.8)] italic transition-all duration-500 whitespace-pre-line">
           {currentReminder}
         </p>
       </div>
