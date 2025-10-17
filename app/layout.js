@@ -8,8 +8,8 @@ const ibmPlexSerif = IBM_Plex_Serif({
 });
 
 export const metadata = {
-  title: "Social Habit Tracker",
-  description: "Track your habits and view others' progress",
+  title: "Camino",
+  description: "Minimal Social Habit Tracker",
   icons: {
     icon: '/logo.png',
   },
