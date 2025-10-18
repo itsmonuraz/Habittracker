@@ -10,23 +10,27 @@ export default function SettingsPage() {
 
   // Initialize theme from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    setTheme(savedTheme);
-    applyTheme(savedTheme);
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      setTheme(savedTheme);
+      applyTheme(savedTheme);
+    } else {
+      // If no saved theme, default to light and save it
+      setTheme('light');
+      localStorage.setItem('theme', 'light');
+      applyTheme('light');
+    }
   }, []);
 
   // Apply theme to document
   const applyTheme = (newTheme) => {
     const root = document.documentElement;
     
-    console.log('Applying theme:', newTheme);
-    console.log('Current classes before:', root.className);
-    
     if (newTheme === 'dark') {
       root.classList.add('dark');
     } else if (newTheme === 'light') {
       root.classList.remove('dark');
-    } else {
+    } else if (newTheme === 'system') {
       // System preference
       if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         root.classList.add('dark');
@@ -34,13 +38,10 @@ export default function SettingsPage() {
         root.classList.remove('dark');
       }
     }
-    
-    console.log('Current classes after:', root.className);
   };
 
   // Handle theme change
   const handleThemeChange = (newTheme) => {
-    console.log('Theme change requested:', newTheme);
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
     applyTheme(newTheme);
