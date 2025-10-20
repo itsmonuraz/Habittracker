@@ -154,22 +154,15 @@ export default function ProfilePage() {
   return (
     <div className="flex flex-col items-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
       {/* Header */}
-      <div className="w-full max-w-[1400px] mb-6 md:mb-8">
+      <div className="w-full max-w-[1400px] mb-1 md:mb-2">
         <div className="flex items-center justify-between gap-4 mb-4">
           <Link href="/">
-            <h1 className="text-lg md:text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+            <h1 className="text-lg md:text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] hover:text-green-900 dark:hover:text-green-900 transition-colors cursor-pointer">
               {currentUser}
             </h1>
           </Link>
-          <div className="flex items-center gap-4">
-            <div className="text-sm font-medium text-[#13343b] dark:text-[#f5f5f5]">
-              {stats.completed}/{stats.total}
-            </div>
-            <Link href="/settings">
-              <button className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors">
-                Settings
-              </button>
-            </Link>
+          <div className="text-sm font-medium text-[#13343b] dark:text-[#f5f5f5]">
+            {stats.completed}/{stats.total}
           </div>
         </div>
       </div>
@@ -208,22 +201,59 @@ export default function ProfilePage() {
                   const monthHabits = getHabitsForMonth(monthKey);
                   const daysInMonth = monthDates.length;
                   
-                  return monthHabits.map((habit, habitIndex) => (
-                    <tr key={`${monthKey}-${habitIndex}`} className={habitIndex === 0 ? 'border-t-2 border-t-[rgba(94,82,64,0.2)] dark:border-t-[rgba(119,124,124,0.3)]' : ''}>
-                      {habitIndex === 0 ? (
-                        <td 
-                          rowSpan={monthHabits.length}
-                          className="text-center border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r-2 border-r-[rgba(94,82,64,0.2)] dark:border-r-[rgba(119,124,124,0.3)] text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 w-[50px] min-w-[50px] p-2"
-                        >
-                          <div className="flex items-center justify-center h-full">
-                            <span className="text-xs font-semibold whitespace-nowrap" style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}>
-                              {monthName}
-                            </span>
-                          </div>
+                  return [
+                    ...monthHabits.map((habit, habitIndex) => (
+                      <tr key={`${monthKey}-${habitIndex}`} className={habitIndex === 0 ? 'border-t-2 border-t-[rgba(94,82,64,0.2)] dark:border-t-[rgba(119,124,124,0.3)]' : ''}>
+                        {habitIndex === 0 ? (
+                          <td 
+                            rowSpan={monthHabits.length + 1}
+                            className="text-center border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r-2 border-r-[rgba(94,82,64,0.2)] dark:border-r-[rgba(119,124,124,0.3)] text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 w-[50px] min-w-[50px] p-2"
+                          >
+                            <div className="flex items-center justify-center h-full">
+                              <span className="text-xs font-semibold whitespace-nowrap" style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}>
+                                {monthName}
+                              </span>
+                            </div>
+                          </td>
+                        ) : null}
+                        <td className="text-left text-xs py-1 px-3 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] text-[#13343b] dark:text-[#f5f5f5] sticky left-[50px] bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[150px]">
+                          {habit}
                         </td>
-                      ) : null}
-                      <td className="text-left text-xs py-1 px-3 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] text-[#13343b] dark:text-[#f5f5f5] sticky left-[50px] bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[150px]">
-                        {habit}
+                        {Array.from({ length: 31 }, (_, dayIndex) => {
+                          const day = dayIndex + 1;
+                          if (day > daysInMonth) {
+                            return (
+                              <td 
+                                key={dayIndex}
+                                className="text-center p-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.08)] dark:border-r-[rgba(119,124,124,0.1)] w-7 min-w-[28px] h-[28px] bg-[rgba(0,0,0,0.03)] dark:bg-[rgba(0,0,0,0.2)]"
+                              />
+                            );
+                          }
+                          
+                          const date = monthDates[dayIndex];
+                          const isCompleted = isHabitCompleted(habit, date);
+                          const isFuture = isFutureDate(date);
+                          const isPast = isPastDate(date);
+                          
+                          return (
+                            <td 
+                              key={dayIndex}
+                              className="text-center p-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.08)] dark:border-r-[rgba(119,124,124,0.1)] w-7 min-w-[28px] h-[28px] transition-all duration-200 relative"
+                            >
+                              <div className={`w-full h-full rounded transition-all duration-200 relative
+                                ${isCompleted ? 'bg-green-700 dark:bg-green-800' : isFuture ? 'bg-black/10' : 'bg-transparent'}
+                                ${isPast && !isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/10 after:pointer-events-none after:rounded' : ''}
+                                ${isPast && isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/20 after:pointer-events-none after:rounded' : ''}
+                              `} />
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    )),
+                    // Productive Hours Row for this month
+                    <tr key={`${monthKey}-hours`}>
+                      <td className="text-left text-xs py-1 px-3 border-b-2 border-b-[rgba(94,82,64,0.2)] dark:border-b-[rgba(119,124,124,0.3)] text-[#13343b] dark:text-[#f5f5f5] sticky left-[50px] bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[150px] font-semibold">
+                        {/* Empty cell for hours row */}
                       </td>
                       {Array.from({ length: 31 }, (_, dayIndex) => {
                         const day = dayIndex + 1;
@@ -231,31 +261,36 @@ export default function ProfilePage() {
                           return (
                             <td 
                               key={dayIndex}
-                              className="text-center p-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.08)] dark:border-r-[rgba(119,124,124,0.1)] w-7 min-w-[28px] h-[28px] bg-[rgba(0,0,0,0.03)] dark:bg-[rgba(0,0,0,0.2)]"
+                              className="text-center p-0.5 border-b-2 border-b-[rgba(94,82,64,0.2)] dark:border-b-[rgba(119,124,124,0.3)] border-r border-r-[rgba(94,82,64,0.08)] dark:border-r-[rgba(119,124,124,0.1)] w-7 min-w-[28px] h-[28px] bg-[rgba(0,0,0,0.03)] dark:bg-[rgba(0,0,0,0.2)]"
                             />
                           );
                         }
                         
                         const date = monthDates[dayIndex];
-                        const isCompleted = isHabitCompleted(habit, date);
                         const isFuture = isFutureDate(date);
                         const isPast = isPastDate(date);
+                        const hours = productiveHours[date] || '';
                         
                         return (
                           <td 
                             key={dayIndex}
-                            className="text-center p-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.08)] dark:border-r-[rgba(119,124,124,0.1)] w-7 min-w-[28px] h-[28px] transition-all duration-200 relative"
+                            className="text-center p-0.5 border-b-2 border-b-[rgba(94,82,64,0.2)] dark:border-b-[rgba(119,124,124,0.3)] border-r border-r-[rgba(94,82,64,0.08)] dark:border-r-[rgba(119,124,124,0.1)] w-7 min-w-[28px] h-[28px]"
                           >
-                            <div className={`w-full h-full rounded transition-all duration-200 relative
-                              ${isCompleted ? 'bg-green-700 dark:bg-green-800' : isFuture ? 'bg-black/10' : 'bg-transparent'}
-                              ${isPast && !isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/10 after:pointer-events-none after:rounded' : ''}
-                              ${isPast && isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/20 after:pointer-events-none after:rounded' : ''}
-                            `} />
+                            <input
+                              type="text"
+                              inputMode="decimal"
+                              value={hours}
+                              disabled={true}
+                              placeholder={isFuture ? '' : '0'}
+                              className={`w-full h-full text-[10px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded cursor-not-allowed
+                                ${isFuture ? 'bg-black/10' : ''}
+                              `}
+                            />
                           </td>
                         );
                       })}
                     </tr>
-                  ));
+                  ];
                 })}
               </tbody>
             </table>
@@ -290,22 +325,59 @@ export default function ProfilePage() {
                   const monthHabits = getHabitsForMonth(monthKey);
                   const daysInMonth = monthDates.length;
                   
-                  return monthHabits.map((habit, habitIndex) => (
-                    <tr key={`${monthKey}-${habitIndex}`} className={habitIndex === 0 ? 'border-t-2 border-t-[rgba(94,82,64,0.2)] dark:border-t-[rgba(119,124,124,0.3)]' : ''}>
-                      {habitIndex === 0 ? (
-                        <td 
-                          rowSpan={monthHabits.length}
-                          className="text-center border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r-2 border-r-[rgba(94,82,64,0.2)] dark:border-r-[rgba(119,124,124,0.3)] text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 w-[40px] min-w-[40px] p-1"
-                        >
-                          <div className="flex items-center justify-center h-full">
-                            <span className="text-[10px] font-semibold whitespace-nowrap" style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}>
-                              {monthName}
-                            </span>
-                          </div>
+                  return [
+                    ...monthHabits.map((habit, habitIndex) => (
+                      <tr key={`${monthKey}-${habitIndex}`} className={habitIndex === 0 ? 'border-t-2 border-t-[rgba(94,82,64,0.2)] dark:border-t-[rgba(119,124,124,0.3)]' : ''}>
+                        {habitIndex === 0 ? (
+                          <td 
+                            rowSpan={monthHabits.length + 1}
+                            className="text-center border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r-2 border-r-[rgba(94,82,64,0.2)] dark:border-r-[rgba(119,124,124,0.3)] text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 w-[40px] min-w-[40px] p-1"
+                          >
+                            <div className="flex items-center justify-center h-full">
+                              <span className="text-[10px] font-semibold whitespace-nowrap" style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}>
+                                {monthName}
+                              </span>
+                            </div>
+                          </td>
+                        ) : null}
+                        <td className="text-left text-[10px] py-1 px-2 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] text-[#13343b] dark:text-[#f5f5f5] sticky left-[40px] bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[80px] truncate">
+                          {habit}
                         </td>
-                      ) : null}
-                      <td className="text-left text-[10px] py-1 px-2 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] text-[#13343b] dark:text-[#f5f5f5] sticky left-[40px] bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[80px] truncate">
-                        {habit}
+                        {Array.from({ length: 31 }, (_, dayIndex) => {
+                          const day = dayIndex + 1;
+                          if (day > daysInMonth) {
+                            return (
+                              <td 
+                                key={dayIndex}
+                                className="text-center p-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.08)] dark:border-r-[rgba(119,124,124,0.1)] w-7 min-w-[28px] h-[28px] bg-[rgba(0,0,0,0.03)] dark:bg-[rgba(0,0,0,0.2)]"
+                              />
+                            );
+                          }
+                          
+                          const date = monthDates[dayIndex];
+                          const isCompleted = isHabitCompleted(habit, date);
+                          const isFuture = isFutureDate(date);
+                          const isPast = isPastDate(date);
+                          
+                          return (
+                            <td 
+                              key={dayIndex}
+                              className="text-center p-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.08)] dark:border-r-[rgba(119,124,124,0.1)] w-7 min-w-[28px] h-[28px] transition-all duration-200 relative"
+                            >
+                              <div className={`w-full h-full rounded transition-all duration-200 relative
+                                ${isCompleted ? 'bg-green-700 dark:bg-green-800' : isFuture ? 'bg-black/10' : 'bg-transparent'}
+                                ${isPast && !isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/10 after:pointer-events-none after:rounded' : ''}
+                                ${isPast && isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/20 after:pointer-events-none after:rounded' : ''}
+                              `} />
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    )),
+                    // Productive Hours Row for this month
+                    <tr key={`${monthKey}-hours`}>
+                      <td className="text-left text-[10px] py-1 px-2 border-b-2 border-b-[rgba(94,82,64,0.2)] dark:border-b-[rgba(119,124,124,0.3)] text-[#13343b] dark:text-[#f5f5f5] sticky left-[40px] bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[80px] font-semibold">
+                        {/* Empty cell for hours row */}
                       </td>
                       {Array.from({ length: 31 }, (_, dayIndex) => {
                         const day = dayIndex + 1;
@@ -313,36 +385,50 @@ export default function ProfilePage() {
                           return (
                             <td 
                               key={dayIndex}
-                              className="text-center p-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.08)] dark:border-r-[rgba(119,124,124,0.1)] w-7 min-w-[28px] h-[28px] bg-[rgba(0,0,0,0.03)] dark:bg-[rgba(0,0,0,0.2)]"
+                              className="text-center p-0.5 border-b-2 border-b-[rgba(94,82,64,0.2)] dark:border-b-[rgba(119,124,124,0.3)] border-r border-r-[rgba(94,82,64,0.08)] dark:border-r-[rgba(119,124,124,0.1)] w-7 min-w-[28px] h-[28px] bg-[rgba(0,0,0,0.03)] dark:bg-[rgba(0,0,0,0.2)]"
                             />
                           );
                         }
                         
                         const date = monthDates[dayIndex];
-                        const isCompleted = isHabitCompleted(habit, date);
                         const isFuture = isFutureDate(date);
                         const isPast = isPastDate(date);
+                        const hours = productiveHours[date] || '';
                         
                         return (
                           <td 
                             key={dayIndex}
-                            className="text-center p-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.08)] dark:border-r-[rgba(119,124,124,0.1)] w-7 min-w-[28px] h-[28px] transition-all duration-200 relative"
+                            className="text-center p-0.5 border-b-2 border-b-[rgba(94,82,64,0.2)] dark:border-b-[rgba(119,124,124,0.3)] border-r border-r-[rgba(94,82,64,0.08)] dark:border-r-[rgba(119,124,124,0.1)] w-7 min-w-[28px] h-[28px]"
                           >
-                            <div className={`w-full h-full rounded transition-all duration-200 relative
-                              ${isCompleted ? 'bg-green-700 dark:bg-green-800' : isFuture ? 'bg-black/10' : 'bg-transparent'}
-                              ${isPast && !isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/10 after:pointer-events-none after:rounded' : ''}
-                              ${isPast && isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/20 after:pointer-events-none after:rounded' : ''}
-                            `} />
+                            <input
+                              type="text"
+                              inputMode="decimal"
+                              value={hours}
+                              disabled={true}
+                              placeholder={isFuture ? '' : '0'}
+                              className={`w-full h-full text-[10px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded cursor-not-allowed
+                                ${isFuture ? 'bg-black/10' : ''}
+                              `}
+                            />
                           </td>
                         );
                       })}
                     </tr>
-                  ));
+                  ];
                 })}
               </tbody>
             </table>
           </div>
         </div>
+      </div>
+
+      {/* Settings Link - Below Table */}
+      <div className="w-full max-w-[1400px] mt-6 text-center">
+        <Link href="/settings">
+          <button className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors">
+            Settings
+          </button>
+        </Link>
       </div>
     </div>
   );

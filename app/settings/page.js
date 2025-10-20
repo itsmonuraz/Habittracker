@@ -53,7 +53,7 @@ export default function SettingsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-xl md:text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5]">Settings</h1>
-          <Link href="/">
+          <Link href="/profile">
             <button className="text-sm md:text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
              back →
             </button>
