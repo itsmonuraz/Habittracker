@@ -91,6 +91,17 @@ const currentDate = getCurrentDate();
 const dateRange = generateDateRange();
 
 export default function CommunityPage() {
+  // State to track which users have their tables expanded
+  const [expandedUsers, setExpandedUsers] = useState({});
+
+  // Toggle expanded state for a user
+  const toggleUserExpansion = (userName) => {
+    setExpandedUsers(prev => ({
+      ...prev,
+      [userName]: !prev[userName]
+    }));
+  };
+
   // Format date for display - just return the day number
   const formatDateHeader = (dateStr) => {
     const date = new Date(dateStr + 'T00:00:00');
@@ -169,17 +180,27 @@ export default function CommunityPage() {
         {Object.keys(userData).map((userName) => {
           const user = userData[userName];
           const stats = getCompletionStats(userName);
+          const isExpanded = expandedUsers[userName];
           
           return (
             <div key={userName} className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-4 w-full overflow-x-auto">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-sm font-semibold text-[#13343b] dark:text-[#f5f5f5]">{userName}</h2>
+              <div className={`flex justify-between items-center ${isExpanded ? 'mb-4' : 'mb-0'}`}>
+                <h2 
+                  onClick={() => toggleUserExpansion(userName)}
+                  className="text-sm font-semibold text-[#13343b] dark:text-[#f5f5f5] cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
+                >
+                  {userName}
+                  <span className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">
+                    {isExpanded ? '▼' : '▶'}
+                  </span>
+                </h2>
                 <div className="text-sm font-medium text-[#13343b] dark:text-[#f5f5f5]">
                   {stats.completed}/{stats.total}
                 </div>
               </div>
               
               {/* Desktop Table */}
+              {isExpanded && (
               <div className="overflow-x-auto hidden md:block">
                 <table className="w-full border-collapse min-w-max">
                   <thead>
@@ -229,8 +250,10 @@ export default function CommunityPage() {
                   </tbody>
                 </table>
               </div>
+              )}
 
               {/* Mobile Table - Vertical Layout */}
+              {isExpanded && (
               <div className="overflow-x-auto md:hidden">
                 <table className="w-full border-collapse">
                   <thead>
@@ -283,6 +306,7 @@ export default function CommunityPage() {
                   </tbody>
                 </table>
               </div>
+              )}
             </div>
           );
         })}
