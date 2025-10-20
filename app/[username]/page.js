@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 // User data stored in memory with habits per month
 const userData = {
@@ -72,15 +73,33 @@ const getCurrentDate = () => {
 
 const currentDate = getCurrentDate();
 
-export default function ProfilePage() {
-  const [currentUser] = useState("@camino");
+export default function UserProfilePage() {
+  const params = useParams();
+  const username = params.username ? `@${params.username}` : "@camino";
   const [productiveHours, setProductiveHours] = useState({});
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const dateRange = generateYearDateRange(2025);
+
+  // Initialize dark mode from localStorage or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    setIsDarkMode(shouldBeDark);
+    document.documentElement.classList.toggle('dark', shouldBeDark);
+  }, []);
+
+  // Toggle dark mode
+  const toggleTheme = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    document.documentElement.classList.toggle('dark', newMode);
+    localStorage.setItem('theme', newMode ? 'dark' : 'light');
+  };
 
   // Screenshot function
   const takeScreenshot = async () => {
     try {
-      // Use html2canvas library to capture the page
       const html2canvas = (await import('html2canvas')).default;
       const element = document.body;
       
@@ -90,17 +109,13 @@ export default function ProfilePage() {
         logging: false,
         useCORS: true,
         onclone: (clonedDoc) => {
-          // Fix any problematic color values in the cloned document
           const allElements = clonedDoc.querySelectorAll('*');
           allElements.forEach((el) => {
-            // Get all computed styles
             const styles = window.getComputedStyle(el);
             
-            // Replace modern color functions with safe fallbacks
             ['backgroundColor', 'color', 'borderColor', 'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor'].forEach(prop => {
               const value = styles[prop];
               if (value && (value.includes('oklab') || value.includes('lab(') || value.includes('lch(') || value.includes('oklch'))) {
-                // Set safe fallback colors
                 if (prop === 'backgroundColor') {
                   el.style.backgroundColor = 'transparent';
                 } else if (prop === 'color') {
@@ -114,7 +129,6 @@ export default function ProfilePage() {
         }
       });
       
-      // Convert canvas to blob and download
       canvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -129,57 +143,48 @@ export default function ProfilePage() {
     }
   };
   
-  // Format date for display - just return the day number
   const formatDateHeader = (dateStr) => {
     const date = new Date(dateStr + 'T00:00:00');
     const day = date.getDate();
     return day;
   };
 
-  // Get month name from date
   const getMonthName = (dateStr) => {
     const date = new Date(dateStr + 'T00:00:00');
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     return monthNames[date.getMonth()];
   };
 
-  // Group dates by month
   const datesByMonth = {};
   dateRange.forEach(date => {
-    const month = date.substring(0, 7); // Get YYYY-MM
+    const month = date.substring(0, 7);
     if (!datesByMonth[month]) {
       datesByMonth[month] = [];
     }
     datesByMonth[month].push(date);
   });
 
-  // Check if a habit is completed on a specific date
   const isHabitCompleted = (habit, date) => {
-    const completions = userData[currentUser].completions[date];
+    const completions = userData[username]?.completions[date];
     return completions && completions.includes(habit);
   };
 
-  // Check if date is in the future
   const isFutureDate = (date) => {
     return date > currentDate;
   };
 
-  // Check if date is in the past
   const isPastDate = (date) => {
     return date < currentDate;
   };
 
-  // Check if date is today
   const isToday = (date) => {
     return date === currentDate;
   };
 
-  // Get habits for a specific month
   const getHabitsForMonth = (monthKey) => {
-    return userData[currentUser].habitsByMonth[monthKey] || [];
+    return userData[username]?.habitsByMonth[monthKey] || [];
   };
 
-  // Calculate completion stats for the year
   const getYearCompletionStats = () => {
     let totalCompleted = 0;
     let totalPossible = 0;
@@ -200,7 +205,23 @@ export default function ProfilePage() {
     return { completed: totalCompleted, total: totalPossible };
   };
 
-  const user = userData[currentUser];
+  // Check if user exists
+  if (!userData[username]) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] mb-4">User not found</h1>
+          <Link href="/">
+            <button className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors">
+              Go back home
+            </button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const user = userData[username];
   const stats = getYearCompletionStats();
 
   return (
@@ -209,11 +230,11 @@ export default function ProfilePage() {
       <div className="w-full max-w-[1400px] mb-1 md:mb-2">
         <div className="flex items-center justify-between gap-4 mb-4">
           <Link href="/">
-            <h1 className="text-lg md:text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] hover:text-green-900 dark:hover:text-green-900 transition-colors cursor-pointer">
-              {currentUser}
+            <h1 className="text-lg md:text-2xl font-bold text-[#13343b] dark:text-[#6f7171] hover:text-[#14532d] dark:hover:text-[#9a9a9a]  transition-colors cursor-pointer">
+              {username}
             </h1>
           </Link>
-          <div className="text-sm font-medium text-[#13343b] dark:text-[#f5f5f5]">
+          <div className="text-sm font-medium text-[#13343b] dark:text-[#6f7171]">
             {stats.completed}/{stats.total}
           </div>
         </div>
@@ -475,18 +496,35 @@ export default function ProfilePage() {
       </div>
 
       {/* Settings and Screenshot Links - Below Table */}
-      <div className="w-full max-w-[1400px] mt-6 text-center flex items-center justify-center gap-4">
-        <Link href="/settings">
-          <button className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors">
-            Settings
+      <div className="w-full max-w-[1400px] mt-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link href="/settings">
+            <button className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors">
+              Settings
+            </button>
+          </Link>
+          <button 
+            onClick={takeScreenshot}
+            className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors"
+          >
+            Screenshot
           </button>
-        </Link>
-        <span className="text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">|</span>
+          <button 
+            onClick={() => {
+              const url = window.location.href;
+              navigator.clipboard.writeText(url);
+              alert('Link copied to clipboard!');
+            }}
+            className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors"
+          >
+            Share
+          </button>
+        </div>
         <button 
-          onClick={takeScreenshot}
-          className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors"
+          onClick={toggleTheme}
+          className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors"
         >
-          Screenshot
+          {isDarkMode ? 'Light' : 'Dark'}
         </button>
       </div>
     </div>

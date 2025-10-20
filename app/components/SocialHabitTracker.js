@@ -428,7 +428,7 @@ export default function SocialHabitTracker() {
 
         {/* Mobile Navigation - Below Table */}
         <div className="md:hidden mt-6 flex justify-between items-center px-2">
-          <Link href="/profile">
+          <Link href={`/${currentUser.replace('@', '')}`}>
             <div className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
               {currentUser}
             </div>
@@ -450,7 +450,7 @@ export default function SocialHabitTracker() {
       </div>
 
       {/* Desktop Navigation - Fixed Position */}
-      <Link href="/profile">
+      <Link href={`/${currentUser.replace('@', '')}`}>
         <div className="hidden md:block fixed bottom-6 left-6 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
           {currentUser}
         </div>
