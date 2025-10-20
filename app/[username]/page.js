@@ -498,14 +498,14 @@ export default function UserProfilePage() {
       {/* Settings and Screenshot Links - Below Table */}
       <div className="w-full max-w-[1400px] mt-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/settings">
-            <button className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors">
+          <Link href="/settings" className="inline-flex items-center">
+            <button className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors leading-none align-baseline">
               Settings
             </button>
           </Link>
           <button 
             onClick={takeScreenshot}
-            className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors"
+            className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors leading-none align-baseline"
           >
             Screenshot
           </button>
@@ -515,14 +515,14 @@ export default function UserProfilePage() {
               navigator.clipboard.writeText(url);
               alert('Link copied to clipboard!');
             }}
-            className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors"
+            className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors leading-none align-baseline"
           >
             Share
           </button>
         </div>
         <button 
           onClick={toggleTheme}
-          className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors"
+          className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors leading-none align-baseline"
         >
           {isDarkMode ? 'Light' : 'Dark'}
         </button>

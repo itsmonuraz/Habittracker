@@ -18,6 +18,50 @@ body {
   font-family: var(--font-ibm-plex-serif), serif;
 }
 
+/* Custom Scrollbar Styling */
+/* For Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(94, 82, 64, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(94, 82, 64, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(94, 82, 64, 0.3);
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: rgba(119, 124, 124, 0.1);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(119, 124, 124, 0.3);
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(119, 124, 124, 0.4);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(94, 82, 64, 0.2) rgba(94, 82, 64, 0.05);
+}
+
+.dark * {
+  scrollbar-color: rgba(119, 124, 124, 0.3) rgba(119, 124, 124, 0.1);
+}
+
 /* Ensure all interactive elements have pointer cursor */
 button,
 a,

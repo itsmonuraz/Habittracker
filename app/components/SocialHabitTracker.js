@@ -193,6 +193,10 @@ export default function SocialHabitTracker() {
       return;
     }
     
+    // Limit to max 2 decimal places
+    const decimalRegex = /^\d*\.?\d{0,2}$/;
+    if (!decimalRegex.test(value)) return;
+    
     // Validate input: allow decimals for minutes (0-20 hours, .00-.59 for minutes)
     const numValue = parseFloat(value);
     if (isNaN(numValue) || numValue < 0 || numValue > 20) return;
