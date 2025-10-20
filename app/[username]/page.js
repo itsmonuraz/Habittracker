@@ -457,6 +457,11 @@ export default function UserProfilePage() {
               Settings
             </button>
           </Link>
+          <Link href="/about" className="inline-flex items-center">
+            <button className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors leading-none align-baseline">
+              About
+            </button>
+          </Link>
           <button 
             onClick={() => {
               const url = window.location.href;
