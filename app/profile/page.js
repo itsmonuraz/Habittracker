@@ -76,6 +76,58 @@ export default function ProfilePage() {
   const [currentUser] = useState("@camino");
   const [productiveHours, setProductiveHours] = useState({});
   const dateRange = generateYearDateRange(2025);
+
+  // Screenshot function
+  const takeScreenshot = async () => {
+    try {
+      // Use html2canvas library to capture the page
+      const html2canvas = (await import('html2canvas')).default;
+      const element = document.body;
+      
+      const canvas = await html2canvas(element, {
+        backgroundColor: '#fcfcf9',
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        onclone: (clonedDoc) => {
+          // Fix any problematic color values in the cloned document
+          const allElements = clonedDoc.querySelectorAll('*');
+          allElements.forEach((el) => {
+            // Get all computed styles
+            const styles = window.getComputedStyle(el);
+            
+            // Replace modern color functions with safe fallbacks
+            ['backgroundColor', 'color', 'borderColor', 'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor'].forEach(prop => {
+              const value = styles[prop];
+              if (value && (value.includes('oklab') || value.includes('lab(') || value.includes('lch(') || value.includes('oklch'))) {
+                // Set safe fallback colors
+                if (prop === 'backgroundColor') {
+                  el.style.backgroundColor = 'transparent';
+                } else if (prop === 'color') {
+                  el.style.color = '#13343b';
+                } else if (prop.includes('border')) {
+                  el.style[prop] = '#e5e5e5';
+                }
+              }
+            });
+          });
+        }
+      });
+      
+      // Convert canvas to blob and download
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `habit-tracker-${new Date().toISOString().split('T')[0]}.png`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+    } catch (error) {
+      console.error('Screenshot failed:', error);
+      alert('Screenshot failed. Please try again.');
+    }
+  };
   
   // Format date for display - just return the day number
   const formatDateHeader = (dateStr) => {
@@ -422,13 +474,20 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Settings Link - Below Table */}
-      <div className="w-full max-w-[1400px] mt-6 text-center">
+      {/* Settings and Screenshot Links - Below Table */}
+      <div className="w-full max-w-[1400px] mt-6 text-center flex items-center justify-center gap-4">
         <Link href="/settings">
           <button className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors">
             Settings
           </button>
         </Link>
+        <span className="text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">|</span>
+        <button 
+          onClick={takeScreenshot}
+          className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors"
+        >
+          Screenshot
+        </button>
       </div>
     </div>
   );
