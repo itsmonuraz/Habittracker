@@ -101,6 +101,9 @@ export default function SocialHabitTracker() {
   const [viewingUser, setViewingUser] = useState("@camino");
   const [userDataState, setUserDataState] = useState(userData);
   
+  // State for productive hours tracking (0-20 hours per day)
+  const [productiveHours, setProductiveHours] = useState({});
+  
   // State for current motivational reminder - start with first one to avoid hydration mismatch
   const [currentReminder, setCurrentReminder] = useState(motivationalReminders[0]);
   const [isClient, setIsClient] = useState(false);
@@ -174,6 +177,34 @@ export default function SocialHabitTracker() {
   // Check if date is today
   const isToday = (date) => {
     return date === currentDate;
+  };
+
+  // Handle productive hours input
+  const handleProductiveHoursChange = (date, value) => {
+    if (viewingUser !== currentUser) return; // Read-only mode
+    if (isFutureDate(date)) return; // Can't set future dates
+    
+    // Allow empty input
+    if (value === '') {
+      setProductiveHours(prev => ({
+        ...prev,
+        [date]: ''
+      }));
+      return;
+    }
+    
+    // Validate input: allow decimals for minutes (0-20 hours, .00-.59 for minutes)
+    const numValue = parseFloat(value);
+    if (isNaN(numValue) || numValue < 0 || numValue > 20) return;
+    
+    // Check if decimal part (minutes) is valid (0-59)
+    const decimalPart = Math.round((numValue % 1) * 100);
+    if (decimalPart > 59) return;
+    
+    setProductiveHours(prev => ({
+      ...prev,
+      [date]: value
+    }));
   };
 
   const isViewingOthers = viewingUser !== currentUser;
@@ -270,6 +301,40 @@ export default function SocialHabitTracker() {
                   })}
                 </tr>
               ))}
+              
+              {/* Productive Hours Row */}
+              <tr>
+                <td className="text-left text-xs py-1 px-2 text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[180px] max-w-[150px] font-semibold">
+                  {/* Empty cell for row label */}
+                </td>
+                {dateRange.map((date, dateIndex) => {
+                  const isFuture = isFutureDate(date);
+                  const isPast = isPastDate(date);
+                  const isDisabled = isViewingOthers || isFuture || isPast;
+                  const hours = productiveHours[date] || '';
+                  
+                  return (
+                    <td 
+                      key={dateIndex}
+                      className="text-center p-0.5 border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] w-7 min-w-[28px] h-[28px]"
+                    >
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={hours}
+                        onChange={(e) => handleProductiveHoursChange(date, e.target.value)}
+                        disabled={isDisabled}
+                        placeholder={isFuture ? '' : '0'}
+                        className={`w-full h-full text-[10px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded
+                          ${!isDisabled ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : 'cursor-not-allowed'}
+                          ${isFuture ? 'bg-black/10' : ''}
+                          focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:ring-1 focus:ring-blue-400
+                        `}
+                      />
+                    </td>
+                  );
+                })}
+              </tr>
             </tbody>
           </table>
         </div>
@@ -291,6 +356,14 @@ export default function SocialHabitTracker() {
                     </div>
                   </th>
                 ))}
+                {/* Productive Hours Column Header */}
+                <th className="border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] min-w-[28px] w-7 sticky top-0 z-10 bg-[#fffffe] dark:bg-[#262828] py-2">
+                  <div className="flex items-center justify-center h-full">
+                    <span className="text-[10px] text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium whitespace-nowrap" style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}>
+                      Hrs
+                    </span>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -327,6 +400,25 @@ export default function SocialHabitTracker() {
                         </td>
                       );
                     })}
+                    
+                    {/* Productive Hours Cell for Mobile */}
+                    <td 
+                      className="text-center p-0.5 border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] w-7 min-w-[28px] h-[28px]"
+                    >
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={productiveHours[date] || ''}
+                        onChange={(e) => handleProductiveHoursChange(date, e.target.value)}
+                        disabled={isViewingOthers || isFutureDate(date) || isPastDate(date)}
+                        placeholder={isFutureDate(date) ? '' : '0'}
+                        className={`w-full h-full text-[10px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded
+                          ${!(isViewingOthers || isFutureDate(date) || isPastDate(date)) ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : 'cursor-not-allowed'}
+                          ${isFutureDate(date) ? 'bg-black/10' : ''}
+                          focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:ring-1 focus:ring-blue-400
+                        `}
+                      />
+                    </td>
                   </tr>
                 );
               })}
