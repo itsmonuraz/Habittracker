@@ -96,52 +96,6 @@ export default function UserProfilePage() {
     document.documentElement.classList.toggle('dark', newMode);
     localStorage.setItem('theme', newMode ? 'dark' : 'light');
   };
-
-  // Screenshot function
-  const takeScreenshot = async () => {
-    try {
-      const html2canvas = (await import('html2canvas')).default;
-      const element = document.body;
-      
-      const canvas = await html2canvas(element, {
-        backgroundColor: '#fcfcf9',
-        scale: 2,
-        logging: false,
-        useCORS: true,
-        onclone: (clonedDoc) => {
-          const allElements = clonedDoc.querySelectorAll('*');
-          allElements.forEach((el) => {
-            const styles = window.getComputedStyle(el);
-            
-            ['backgroundColor', 'color', 'borderColor', 'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor'].forEach(prop => {
-              const value = styles[prop];
-              if (value && (value.includes('oklab') || value.includes('lab(') || value.includes('lch(') || value.includes('oklch'))) {
-                if (prop === 'backgroundColor') {
-                  el.style.backgroundColor = 'transparent';
-                } else if (prop === 'color') {
-                  el.style.color = '#13343b';
-                } else if (prop.includes('border')) {
-                  el.style[prop] = '#e5e5e5';
-                }
-              }
-            });
-          });
-        }
-      });
-      
-      canvas.toBlob((blob) => {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = `habit-tracker-${new Date().toISOString().split('T')[0]}.png`;
-        link.href = url;
-        link.click();
-        URL.revokeObjectURL(url);
-      });
-    } catch (error) {
-      console.error('Screenshot failed:', error);
-      alert('Screenshot failed. Please try again.');
-    }
-  };
   
   const formatDateHeader = (dateStr) => {
     const date = new Date(dateStr + 'T00:00:00');
@@ -503,12 +457,6 @@ export default function UserProfilePage() {
               Settings
             </button>
           </Link>
-          <button 
-            onClick={takeScreenshot}
-            className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors leading-none align-baseline"
-          >
-            Screenshot
-          </button>
           <button 
             onClick={() => {
               const url = window.location.href;
