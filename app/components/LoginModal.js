@@ -59,7 +59,14 @@ export default function LoginModal({ isOpen, onClose, message }) {
     setIsLoading(true);
     setError('');
     try {
-      await signInWithGoogle(username || null);
+      const result = await signInWithGoogle(username || null);
+      
+      // If result is null, user cancelled the popup
+      if (result === null) {
+        setIsLoading(false);
+        return;
+      }
+      
       onClose();
     } catch (err) {
       setError(err.message || 'Failed to sign in with Google');

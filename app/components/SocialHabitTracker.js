@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { db, auth } from '../lib/firebase';
+import { getFirestoreDb, getFirebaseAuth, isFirebaseAvailable } from '../lib/firebase';
 import { collection } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 import { useHabits } from '../contexts/HabitsContext';
@@ -149,6 +149,8 @@ export default function SocialHabitTracker() {
   
   // Test Firebase connection
   useEffect(() => {
+    const db = isFirebaseAvailable() ? getFirestoreDb() : null;
+    const auth = isFirebaseAvailable() ? getFirebaseAuth() : null;
     console.log('🔥 Firebase DB initialized:', db ? 'Success ✅' : 'Failed ❌');
     console.log('🔐 Firebase Auth initialized:', auth ? 'Success ✅' : 'Failed ❌');
     console.log('📊 Firebase Config:', {

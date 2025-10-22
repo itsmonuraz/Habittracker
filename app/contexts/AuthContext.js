@@ -1,8 +1,8 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { 
-  signInWithPopup, 
+import {
+  signInWithPopup,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
@@ -10,7 +10,7 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp, query, collection, where, getDocs } from 'firebase/firestore';
-import { auth, googleProvider, db } from '../lib/firebase';
+import { getFirebaseAuth, getFirebaseProvider, getFirestoreDb, isFirebaseAvailable } from '../lib/firebase';
 
 const AuthContext = createContext({});
 
@@ -21,12 +21,27 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Listen for auth state changes (client-only)
+    if (!isFirebaseAvailable()) {
+      // No firebase on client (rare) - treat as logged out demo mode
+      setLoading(false);
+      return;
+    }
+
+    const firebaseAuth = getFirebaseAuth();
+
+    if (!firebaseAuth) {
+      setLoading(false);
+      return;
+    }
+
     // Listen for auth state changes
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
       if (firebaseUser) {
         // User is signed in
         try {
-          const userDocRef = doc(db, 'users', firebaseUser.uid);
+          const firestoreDb = getFirestoreDb();
+          const userDocRef = doc(firestoreDb, 'users', firebaseUser.uid);
           const userDoc = await getDoc(userDocRef);
 
           if (!userDoc.exists()) {
@@ -79,8 +94,9 @@ export function AuthProvider({ children }) {
   // Check if username is available
   const checkUsernameAvailability = async (username) => {
     try {
+      const firestoreDb = getFirestoreDb();
       const usernameToCheck = username.startsWith('@') ? username : `@${username}`;
-      const usersRef = collection(db, 'users');
+      const usersRef = collection(firestoreDb, 'users');
       const q = query(usersRef, where('username', '==', usernameToCheck));
       const querySnapshot = await getDocs(q);
       return querySnapshot.empty; // true if available, false if taken
@@ -92,8 +108,9 @@ export function AuthProvider({ children }) {
 
   // Create user profile in Firestore
   const createUserProfile = async (uid, email, displayName, username) => {
+    const firestoreDb = getFirestoreDb();
     const usernameWithAt = username.startsWith('@') ? username : `@${username}`;
-    const userDocRef = doc(db, 'users', uid);
+    const userDocRef = doc(firestoreDb, 'users', uid);
     await setDoc(userDocRef, {
       uid,
       email,
@@ -116,7 +133,8 @@ export function AuthProvider({ children }) {
       }
 
       // Create auth user
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseAuth = getFirebaseAuth();
+      const userCredential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
       
       // Update profile with display name
       await updateProfile(userCredential.user, {
@@ -136,7 +154,8 @@ export function AuthProvider({ children }) {
   // Sign in with email and password
   const signInWithEmail = async (email, password) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseAuth = getFirebaseAuth();
+      const userCredential = await signInWithEmailAndPassword(firebaseAuth, email, password);
       return userCredential.user;
     } catch (err) {
       console.error('Sign in error:', err);
@@ -147,7 +166,9 @@ export function AuthProvider({ children }) {
   // Sign in with Google (with custom username option)
   const signInWithGoogle = async (customUsername = null) => {
     try {
-      const result = await signInWithPopup(auth, googleProvider);
+      const firebaseAuth = getFirebaseAuth();
+      const provider = getFirebaseProvider();
+      const result = await signInWithPopup(firebaseAuth, provider);
       
       // If custom username provided, update it
       if (customUsername) {
@@ -156,7 +177,8 @@ export function AuthProvider({ children }) {
           throw new Error('Username is already taken');
         }
         
-        const userDocRef = doc(db, 'users', result.user.uid);
+        const firestoreDb = getFirestoreDb();
+        const userDocRef = doc(firestoreDb, 'users', result.user.uid);
         const usernameWithAt = customUsername.startsWith('@') ? customUsername : `@${customUsername}`;
         await setDoc(userDocRef, {
           username: usernameWithAt
@@ -165,6 +187,17 @@ export function AuthProvider({ children }) {
       
       return result.user;
     } catch (err) {
+      // Handle specific Firebase Auth errors
+      if (err.code === 'auth/popup-closed-by-user') {
+        // User closed the popup - this is not really an error, just cancelled
+        console.log('Sign-in popup was closed by user');
+        return null; // Return null instead of throwing
+      } else if (err.code === 'auth/cancelled-popup-request') {
+        // Multiple popups attempted - only one can be shown at a time
+        console.log('Another popup is already open');
+        return null;
+      }
+      
       console.error('Sign in error:', err);
       throw err;
     }
@@ -172,7 +205,8 @@ export function AuthProvider({ children }) {
 
   const signOut = async () => {
     try {
-      await firebaseSignOut(auth);
+      const firebaseAuth = getFirebaseAuth();
+      await firebaseSignOut(firebaseAuth);
     } catch (err) {
       console.error('Sign out error:', err);
     }
