@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { db, auth } from '../lib/firebase';
+import { collection } from 'firebase/firestore';
+import { useAuth } from '../contexts/AuthContext';
+import { useHabits } from '../contexts/HabitsContext';
+import LoginModal from './LoginModal';
 
 // User data stored in memory
 const userData = {
@@ -97,12 +102,65 @@ const motivationalReminders = [
 ];
 
 export default function SocialHabitTracker() {
-  const [currentUser] = useState("@camino");
-  const [viewingUser, setViewingUser] = useState("@camino");
-  const [userDataState, setUserDataState] = useState(userData);
+  const { user: authUser, loading: authLoading } = useAuth();
+  const { getHabitsForMonth, toggleCompletion, isCompleted: isHabitCompletedInContext, productiveHours, updateProductiveHours, getProductiveHours } = useHabits();
   
-  // State for productive hours tracking (0-20 hours per day)
-  const [productiveHours, setProductiveHours] = useState({});
+  // Get current month for habits
+  const currentMonthKey = currentDate.substring(0, 7); // "2025-10"
+  
+  // Determine the current user - use authUser's username if logged in, otherwise use demo
+  const currentUser = authUser?.username || "@camino";
+  const [viewingUser, setViewingUser] = useState(currentUser);
+  
+  // Initialize user data - create empty data for new users
+  const [userDataState, setUserDataState] = useState(() => {
+    if (authUser && !userData[authUser.username]) {
+      // New user - initialize with empty habits
+      return {
+        ...userData,
+        [authUser.username]: {
+          habits: [],
+          completions: {}
+        }
+      };
+    }
+    return userData;
+  });
+  
+  // Update viewing user when authUser changes
+  useEffect(() => {
+    if (authUser?.username) {
+      setViewingUser(authUser.username);
+      // Ensure user data exists for the logged-in user
+      setUserDataState(prevData => {
+        if (!prevData[authUser.username]) {
+          return {
+            ...prevData,
+            [authUser.username]: {
+              habits: [],
+              completions: {}
+            }
+          };
+        }
+        return prevData;
+      });
+    }
+  }, [authUser]);
+  
+  // Test Firebase connection
+  useEffect(() => {
+    console.log('🔥 Firebase DB initialized:', db ? 'Success ✅' : 'Failed ❌');
+    console.log('🔐 Firebase Auth initialized:', auth ? 'Success ✅' : 'Failed ❌');
+    console.log('📊 Firebase Config:', {
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    });
+    console.log('👤 User:', authUser ? `Logged in as ${authUser.displayName} (${authUser.username})` : 'Not logged in (viewing demo)');
+  }, [authUser]);
+  
+  // Login modal state
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginMessage, setLoginMessage] = useState('');
   
   // State for current motivational reminder - start with first one to avoid hydration mismatch
   const [currentReminder, setCurrentReminder] = useState(motivationalReminders[0]);
@@ -136,32 +194,29 @@ export default function SocialHabitTracker() {
 
   // Check if a habit is completed on a specific date
   const isHabitCompleted = (user, habit, date) => {
-    const completions = userDataState[user].completions[date];
+    // If viewing own profile (logged in), use shared context
+    if (authUser && user === authUser.username) {
+      return isHabitCompletedInContext(date, habit);
+    }
+    // For demo users, use local state
+    const completions = userDataState[user]?.completions[date];
     return completions && completions.includes(habit);
   };
 
   // Toggle habit completion
   const toggleHabitCompletion = (habit, date) => {
+    // If not logged in, show login modal
+    if (!authUser) {
+      setLoginMessage("Sign in to track your own habits and save your progress");
+      setShowLoginModal(true);
+      return;
+    }
+    
     if (viewingUser !== currentUser) return; // Read-only mode
     if (isFutureDate(date)) return; // Can't toggle future dates
 
-    setUserDataState(prevData => {
-      const newData = JSON.parse(JSON.stringify(prevData)); // Deep clone
-      const completions = newData[currentUser].completions;
-
-      if (!completions[date]) {
-        completions[date] = [];
-      }
-
-      const habitIndex = completions[date].indexOf(habit);
-      if (habitIndex > -1) {
-        completions[date].splice(habitIndex, 1);
-      } else {
-        completions[date].push(habit);
-      }
-
-      return newData;
-    });
+    // Use shared context for logged-in users
+    toggleCompletion(date, habit);
   };
 
   // Check if date is in the future
@@ -181,15 +236,19 @@ export default function SocialHabitTracker() {
 
   // Handle productive hours input
   const handleProductiveHoursChange = (date, value) => {
+    // If not logged in, show login modal
+    if (!authUser) {
+      setLoginMessage("Sign in to track your productive hours");
+      setShowLoginModal(true);
+      return;
+    }
+    
     if (viewingUser !== currentUser) return; // Read-only mode
     if (isFutureDate(date)) return; // Can't set future dates
     
     // Allow empty input
     if (value === '') {
-      setProductiveHours(prev => ({
-        ...prev,
-        [date]: ''
-      }));
+      updateProductiveHours(date, '');
       return;
     }
     
@@ -205,14 +264,15 @@ export default function SocialHabitTracker() {
     const decimalPart = Math.round((numValue % 1) * 100);
     if (decimalPart > 59) return;
     
-    setProductiveHours(prev => ({
-      ...prev,
-      [date]: value
-    }));
+    updateProductiveHours(date, value);
   };
 
   const isViewingOthers = viewingUser !== currentUser;
-  const user = userDataState[viewingUser];
+  
+  // Use shared habits for logged-in users (current month), demo data for others
+  const user = authUser && viewingUser === authUser.username
+    ? { habits: getHabitsForMonth(currentMonthKey), completions: {} }
+    : (userDataState[viewingUser] || { habits: [], completions: {} });
 
   // Get current month and year
   const getCurrentMonthYear = () => {
@@ -241,8 +301,32 @@ export default function SocialHabitTracker() {
     return { completed: totalCompleted, total: totalPossible };
   };
 
+  // Show empty state message if user has no habits
+  const showEmptyState = user.habits.length === 0;
+  
+  // Show helpful message for logged-in users
+  const showHabitsPrompt = authUser && user.habits.length > 0 && user.habits.every(h => h.startsWith('Habit '));
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 relative bg-[#fcfcf9] dark:bg-[#1f2121]">
+      {/* Sign in prompt for non-logged in users */}
+      {!authUser && !authLoading && (
+        <div className="mb-4 text-center py-3 px-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+          <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+            This is only demo data
+          </p>
+          <button
+            onClick={() => {
+              setLoginMessage("Sign in to track your own habits and save your progress");
+              setShowLoginModal(true);
+            }}
+            className="text-sm text-green-700 dark:text-green-400 underline hover:text-green-900 dark:hover:text-green-300 transition-colors cursor-pointer bg-transparent border-none font-semibold"
+          >
+            Sign in to start tracking your habits
+          </button>
+        </div>
+      )}
+      
       <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-4 w-full max-w-[1100px] overflow-x-auto">
         <div className="flex justify-between items-center pl-2 pr-2 mb-4">
           <div className="text-sm font-medium text-[#13343b] dark:text-[#f5f5f5]">
@@ -253,7 +337,32 @@ export default function SocialHabitTracker() {
           </div>
         </div>
 
+        {/* Empty State - Show when user has no habits */}
+        {showEmptyState && (
+          <div className="py-16 text-center">
+            <p className="text-lg text-[#626c71] dark:text-[rgba(167,169,169,0.8)] mb-4">
+              Welcome, {authUser?.displayName || 'User'}! 👋
+            </p>
+            <p className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-6">
+              You don&apos;t have any habits yet. Start building your routine!
+            </p>
+            <p className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.6)] italic">
+              Coming soon: Add and manage your own habits
+            </p>
+          </div>
+        )}
+        
+        {/* Prompt to customize habits */}
+        {showHabitsPrompt && !showEmptyState && (
+          <div className="mb-4 text-center py-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+            <p className="text-xs text-green-800 dark:text-green-300">
+              Click on your <Link href={`/${currentUser.replace('@', '')}`} className="underline font-semibold">username</Link> to customize your habit names
+            </p>
+          </div>
+        )}
+
         {/* Desktop Table */}
+        {!showEmptyState && (
         <div className="overflow-x-auto hidden md:block">
           <table className="w-full border-collapse min-w-max">
             <thead>
@@ -315,7 +424,7 @@ export default function SocialHabitTracker() {
                   const isFuture = isFutureDate(date);
                   const isPast = isPastDate(date);
                   const isDisabled = isViewingOthers || isFuture || isPast;
-                  const hours = productiveHours[date] || '';
+                  const hours = getProductiveHours(date);
                   
                   return (
                     <td 
@@ -332,7 +441,7 @@ export default function SocialHabitTracker() {
                         className={`w-full h-full text-[10px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded
                           ${!isDisabled ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : 'cursor-not-allowed'}
                           ${isFuture ? 'bg-black/10' : ''}
-                          focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:ring-1 focus:ring-blue-400
+                          focus:bg-green-50 dark:focus:bg-green-900/20 focus:ring-1 focus:ring-green-600
                         `}
                       />
                     </td>
@@ -342,8 +451,10 @@ export default function SocialHabitTracker() {
             </tbody>
           </table>
         </div>
+        )}
 
         {/* Mobile Table - Vertical Layout */}
+        {!showEmptyState && (
         <div className="overflow-x-auto md:hidden">
           <table className="w-full border-collapse">
             <thead>
@@ -412,14 +523,14 @@ export default function SocialHabitTracker() {
                       <input
                         type="text"
                         inputMode="decimal"
-                        value={productiveHours[date] || ''}
+                        value={getProductiveHours(date)}
                         onChange={(e) => handleProductiveHoursChange(date, e.target.value)}
                         disabled={isViewingOthers || isFutureDate(date) || isPastDate(date)}
                         placeholder={isFutureDate(date) ? '' : '0'}
                         className={`w-full h-full text-[10px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded
                           ${!(isViewingOthers || isFutureDate(date) || isPastDate(date)) ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : 'cursor-not-allowed'}
                           ${isFutureDate(date) ? 'bg-black/10' : ''}
-                          focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:ring-1 focus:ring-blue-400
+                          focus:bg-green-50 dark:focus:bg-green-900/20 focus:ring-1 focus:ring-green-600
                         `}
                       />
                     </td>
@@ -429,6 +540,7 @@ export default function SocialHabitTracker() {
             </tbody>
           </table>
         </div>
+        )}
 
         {/* Mobile Navigation - Below Table */}
         <div className="md:hidden mt-6 flex justify-between items-center px-2">
@@ -472,6 +584,13 @@ export default function SocialHabitTracker() {
           />
         </button>
       </Link>
+      
+      {/* Login Modal */}
+      <LoginModal 
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        message={loginMessage}
+      />
     </div>
   );
 }

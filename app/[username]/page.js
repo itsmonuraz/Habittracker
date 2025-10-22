@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { useAuth } from '../contexts/AuthContext';
+import { useHabits } from '../contexts/HabitsContext';
 
-// User data stored in memory with habits per month
-const userData = {
+// Demo user data for non-logged in users
+const demoUserData = {
   "@camino": {
     habitsByMonth: {
       "2025-01": ["Morning Meditation", "Exercise", "Read 30min"],
@@ -25,18 +27,6 @@ const userData = {
       "2025-10-01": ["Morning Meditation", "Exercise", "Read 30min"],
       "2025-10-02": ["Morning Meditation", "Drink 8 glasses water"],
       "2025-10-03": ["Morning Meditation", "Exercise", "Read 30min", "Drink 8 glasses water"],
-      "2025-10-04": ["Morning Meditation", "Read 30min"],
-      "2025-10-05": ["Morning Meditation", "Exercise", "Drink 8 glasses water", "No social media before 6pm"],
-      "2025-10-06": ["Morning Meditation", "Exercise", "Read 30min"],
-      "2025-10-07": ["Morning Meditation"],
-      "2025-10-08": ["Morning Meditation", "Exercise", "Read 30min", "Drink 8 glasses water"],
-      "2025-10-09": ["Morning Meditation", "Exercise", "Read 30min"],
-      "2025-10-10": ["Morning Meditation", "Drink 8 glasses water"],
-      "2025-10-11": ["Morning Meditation", "Exercise", "Read 30min", "Drink 8 glasses water"],
-      "2025-10-12": ["Morning Meditation", "Read 30min"],
-      "2025-10-13": ["Morning Meditation", "Exercise", "Drink 8 glasses water", "No social media before 6pm"],
-      "2025-10-14": ["Morning Meditation", "Exercise", "Read 30min"],
-      "2025-10-15": ["Morning Meditation"]
     }
   }
 };
@@ -76,9 +66,18 @@ const currentDate = getCurrentDate();
 export default function UserProfilePage() {
   const params = useParams();
   const username = params.username ? `@${params.username}` : "@camino";
-  const [productiveHours, setProductiveHours] = useState({});
+  const { user: authUser, loading: authLoading } = useAuth();
+  const { getHabitsForMonth, updateHabitName, addHabitToMonth, isCompleted: isHabitCompletedInContext, productiveHours, updateProductiveHours, getProductiveHours } = useHabits();
+  
   const [isDarkMode, setIsDarkMode] = useState(false);
   const dateRange = generateYearDateRange(2025);
+  
+  // State for editing habit names - format: "monthKey-habitIndex"
+  const [editingHabit, setEditingHabit] = useState(null);
+  const [editingValue, setEditingValue] = useState('');
+  
+  // Check if viewing own profile
+  const isOwnProfile = authUser && username === authUser.username;
 
   // Initialize dark mode from localStorage or system preference
   useEffect(() => {
@@ -119,7 +118,12 @@ export default function UserProfilePage() {
   });
 
   const isHabitCompleted = (habit, date) => {
-    const completions = userData[username]?.completions[date];
+    // For own profile, use shared context
+    if (isOwnProfile) {
+      return isHabitCompletedInContext(date, habit);
+    }
+    // For demo users
+    const completions = demoUserData[username]?.completions[date];
     return completions && completions.includes(habit);
   };
 
@@ -135,8 +139,41 @@ export default function UserProfilePage() {
     return date === currentDate;
   };
 
-  const getHabitsForMonth = (monthKey) => {
-    return userData[username]?.habitsByMonth[monthKey] || [];
+  const getHabitsForMonthDisplay = (monthKey) => {
+    // If viewing own profile, use shared habits from context
+    if (isOwnProfile) {
+      return getHabitsForMonth(monthKey);
+    }
+    // Otherwise use demo data
+    return demoUserData[username]?.habitsByMonth[monthKey] || [];
+  };
+  
+  // Handle habit name editing
+  const startEditingHabit = (uniqueId, currentName, monthKey, realIndex) => {
+    if (!isOwnProfile) return;
+    console.log('Starting edit:', { uniqueId, currentName, monthKey, realIndex });
+    setEditingHabit(uniqueId);
+    setEditingValue(currentName);
+  };
+  
+  const saveHabitName = (monthKey, index) => {
+    console.log('Saving habit name:', { monthKey, index, editingValue });
+    if (editingValue.trim()) {
+      updateHabitName(monthKey, index, editingValue.trim());
+    }
+    setEditingHabit(null);
+    setEditingValue('');
+  };
+  
+  const cancelEditingHabit = () => {
+    setEditingHabit(null);
+    setEditingValue('');
+  };
+  
+  // Add new habit to a specific month
+  const handleAddHabitToMonth = (monthKey) => {
+    if (!isOwnProfile) return;
+    addHabitToMonth(monthKey);
   };
 
   const getYearCompletionStats = () => {
@@ -147,7 +184,7 @@ export default function UserProfilePage() {
     
     passedDates.forEach(date => {
       const monthKey = date.substring(0, 7);
-      const monthHabits = getHabitsForMonth(monthKey);
+      const monthHabits = getHabitsForMonthDisplay(monthKey);
       monthHabits.forEach(habit => {
         totalPossible++;
         if (isHabitCompleted(habit, date)) {
@@ -159,8 +196,10 @@ export default function UserProfilePage() {
     return { completed: totalCompleted, total: totalPossible };
   };
 
-  // Check if user exists
-  if (!userData[username]) {
+  // Check if user exists - allow logged-in users to view their own profile even if not in demo data
+  const userExists = demoUserData[username] || (authUser && username === authUser.username);
+  
+  if (!userExists && !authLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
         <div className="text-center">
@@ -175,7 +214,7 @@ export default function UserProfilePage() {
     );
   }
 
-  const user = userData[username];
+  const user = demoUserData[username] || { habitsByMonth: {}, completions: {} };
   const stats = getYearCompletionStats();
 
   return (
@@ -203,6 +242,15 @@ export default function UserProfilePage() {
             </h2>
           </div>
           
+          {/* Editing hint for own profile */}
+          {isOwnProfile && (
+            <div className="mb-4 text-center py-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+              <p className="text-xs text-green-800 dark:text-green-300">
+                Click on any habit name to edit it || Click <strong>+</strong> to add habits to each month
+              </p>
+            </div>
+          )}
+          
           {/* Desktop Table */}
           <div className="overflow-x-auto hidden md:block">
             <table className="w-full border-collapse min-w-max">
@@ -225,7 +273,7 @@ export default function UserProfilePage() {
                 {Object.keys(datesByMonth).map((monthKey, monthIndex) => {
                   const monthDates = datesByMonth[monthKey];
                   const monthName = getMonthName(monthDates[0]);
-                  const monthHabits = getHabitsForMonth(monthKey);
+                  const monthHabits = getHabitsForMonthDisplay(monthKey);
                   const daysInMonth = monthDates.length;
                   
                   return [
@@ -244,7 +292,31 @@ export default function UserProfilePage() {
                           </td>
                         ) : null}
                         <td className="text-left text-xs py-1 px-3 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] text-[#13343b] dark:text-[#f5f5f5] sticky left-[50px] bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[150px]">
-                          {habit}
+                          {isOwnProfile && editingHabit === `${monthKey}-${habitIndex}` ? (
+                            <input
+                              type="text"
+                              value={editingValue}
+                              onChange={(e) => setEditingValue(e.target.value)}
+                              onBlur={() => saveHabitName(monthKey, habitIndex)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  saveHabitName(monthKey, habitIndex);
+                                }
+                                if (e.key === 'Escape') cancelEditingHabit();
+                              }}
+                              autoFocus
+                              className="w-full px-2 py-1 text-xs bg-white dark:bg-[#1a1a1a] border-2 border-green-600 dark:border-green-700 rounded outline-none focus:border-green-700 dark:focus:border-green-600"
+                            />
+                          ) : (
+                            <span
+                              onClick={() => isOwnProfile && startEditingHabit(`${monthKey}-${habitIndex}`, habit, monthKey, habitIndex)}
+                              className={isOwnProfile ? 'cursor-pointer hover:text-green-700 dark:hover:text-green-400 transition-colors' : ''}
+                              title={isOwnProfile ? 'Click to edit' : ''}
+                            >
+                              {habit}
+                            </span>
+                          )}
                         </td>
                         {Array.from({ length: 31 }, (_, dayIndex) => {
                           const day = dayIndex + 1;
@@ -280,7 +352,17 @@ export default function UserProfilePage() {
                     // Productive Hours Row for this month
                     <tr key={`${monthKey}-hours`}>
                       <td className="text-left text-xs py-1 px-3 border-b-2 border-b-[rgba(94,82,64,0.2)] dark:border-b-[rgba(119,124,124,0.3)] text-[#13343b] dark:text-[#f5f5f5] sticky left-[50px] bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[150px] font-semibold">
-                        {/* Empty cell for hours row */}
+                        {isOwnProfile ? (
+                          <button
+                            onClick={() => handleAddHabitToMonth(monthKey)}
+                            className="text-xs  hover:text-gray-600 font-sm"
+                            title="Add new habit to this month"
+                          >
+                            +
+                          </button>
+                        ) : (
+                          <span>{/* Empty cell for hours row */}</span>
+                        )}
                       </td>
                       {Array.from({ length: 31 }, (_, dayIndex) => {
                         const day = dayIndex + 1;
@@ -296,7 +378,7 @@ export default function UserProfilePage() {
                         const date = monthDates[dayIndex];
                         const isFuture = isFutureDate(date);
                         const isPast = isPastDate(date);
-                        const hours = productiveHours[date] || '';
+                        const hours = getProductiveHours(date);
                         
                         return (
                           <td 
@@ -307,9 +389,10 @@ export default function UserProfilePage() {
                               type="text"
                               inputMode="decimal"
                               value={hours}
-                              disabled={true}
+                              disabled={!isOwnProfile}
+                              onChange={(e) => isOwnProfile && updateProductiveHours(date, e.target.value)}
                               placeholder={isFuture ? '' : '0'}
-                              className={`w-full h-full text-[10px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded cursor-not-allowed
+                              className={`w-full h-full text-[10px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded ${isOwnProfile ? 'cursor-text hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-green-50 dark:focus:bg-green-900/20 focus:ring-1 focus:ring-green-600' : 'cursor-not-allowed'}
                                 ${isFuture ? 'bg-black/10' : ''}
                               `}
                             />
@@ -349,7 +432,7 @@ export default function UserProfilePage() {
                 {Object.keys(datesByMonth).map((monthKey) => {
                   const monthDates = datesByMonth[monthKey];
                   const monthName = getMonthName(monthDates[0]);
-                  const monthHabits = getHabitsForMonth(monthKey);
+                  const monthHabits = getHabitsForMonthDisplay(monthKey);
                   const daysInMonth = monthDates.length;
                   
                   return [
@@ -358,7 +441,7 @@ export default function UserProfilePage() {
                         {habitIndex === 0 ? (
                           <td 
                             rowSpan={monthHabits.length + 1}
-                            className="text-center border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r-2 border-r-[rgba(94,82,64,0.2)] dark:border-r-[rgba(119,124,124,0.3)] text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 w-[40px] min-w-[40px] p-1"
+                            className="text-center border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r-2 border-r-[rgba(94,82,64,0.2)] dark:border-r-[rgba(119,124,124,0.3)] text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 w-[50px] min-w-[50px] p-2"
                           >
                             <div className="flex items-center justify-center h-full">
                               <span className="text-[10px] font-semibold whitespace-nowrap" style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}>
@@ -368,7 +451,31 @@ export default function UserProfilePage() {
                           </td>
                         ) : null}
                         <td className="text-left text-[10px] py-1 px-2 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] text-[#13343b] dark:text-[#f5f5f5] sticky left-[40px] bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[80px] truncate">
-                          {habit}
+                          {isOwnProfile && editingHabit === `${monthKey}-${habitIndex}` ? (
+                            <input
+                              type="text"
+                              value={editingValue}
+                              onChange={(e) => setEditingValue(e.target.value)}
+                              onBlur={() => saveHabitName(monthKey, habitIndex)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  saveHabitName(monthKey, habitIndex);
+                                }
+                                if (e.key === 'Escape') cancelEditingHabit();
+                              }}
+                              autoFocus
+                              className="w-full px-1 py-0.5 text-[10px] bg-white dark:bg-[#1a1a1a] border-2 border-green-600 dark:border-green-700 rounded outline-none focus:border-green-700 dark:focus:border-green-600"
+                            />
+                          ) : (
+                            <span
+                              onClick={() => isOwnProfile && startEditingHabit(`${monthKey}-${habitIndex}`, habit, monthKey, habitIndex)}
+                              className={isOwnProfile ? 'cursor-pointer hover:text-green-700 dark:hover:text-green-400 transition-colors' : ''}
+                              title={isOwnProfile ? 'Click to edit' : ''}
+                            >
+                              {habit}
+                            </span>
+                          )}
                         </td>
                         {Array.from({ length: 31 }, (_, dayIndex) => {
                           const day = dayIndex + 1;
@@ -404,7 +511,17 @@ export default function UserProfilePage() {
                     // Productive Hours Row for this month
                     <tr key={`${monthKey}-hours`}>
                       <td className="text-left text-[10px] py-1 px-2 border-b-2 border-b-[rgba(94,82,64,0.2)] dark:border-b-[rgba(119,124,124,0.3)] text-[#13343b] dark:text-[#f5f5f5] sticky left-[40px] bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[80px] font-semibold">
-                        {/* Empty cell for hours row */}
+                        {isOwnProfile ? (
+                          <button
+                            onClick={() => handleAddHabitToMonth(monthKey)}
+                            className="text-[10px] px-1.5 py-0.5 bg-green-700 hover:bg-green-800 dark:bg-green-800 dark:hover:bg-green-700 text-white rounded transition-colors font-medium"
+                            title="Add new habit to this month"
+                          >
+                            + Add
+                          </button>
+                        ) : (
+                          <span>{/* Empty cell for hours row */}</span>
+                        )}
                       </td>
                       {Array.from({ length: 31 }, (_, dayIndex) => {
                         const day = dayIndex + 1;
@@ -420,7 +537,7 @@ export default function UserProfilePage() {
                         const date = monthDates[dayIndex];
                         const isFuture = isFutureDate(date);
                         const isPast = isPastDate(date);
-                        const hours = productiveHours[date] || '';
+                        const hours = getProductiveHours(date);
                         
                         return (
                           <td 
@@ -431,9 +548,10 @@ export default function UserProfilePage() {
                               type="text"
                               inputMode="decimal"
                               value={hours}
-                              disabled={true}
+                              disabled={!isOwnProfile}
+                              onChange={(e) => isOwnProfile && updateProductiveHours(date, e.target.value)}
                               placeholder={isFuture ? '' : '0'}
-                              className={`w-full h-full text-[10px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded cursor-not-allowed
+                              className={`w-full h-full text-[10px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded ${isOwnProfile ? 'cursor-text hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-green-50 dark:focus:bg-green-900/20 focus:ring-1 focus:ring-green-600' : 'cursor-not-allowed'}
                                 ${isFuture ? 'bg-black/10' : ''}
                               `}
                             />

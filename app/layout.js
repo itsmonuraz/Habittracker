@@ -1,5 +1,7 @@
 import { IBM_Plex_Serif } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "./contexts/AuthContext";
+import { HabitsProvider } from "./contexts/HabitsContext";
 
 const ibmPlexSerif = IBM_Plex_Serif({
   weight: ['400', '500', '600', '700'],
@@ -37,7 +39,11 @@ export default function RootLayout({ children }) {
       <body
         className={`${ibmPlexSerif.variable} antialiased font-serif`}
       >
-        {children}
+        <AuthProvider>
+          <HabitsProvider>
+            {children}
+          </HabitsProvider>
+        </AuthProvider>
       </body>
     </html>
   );

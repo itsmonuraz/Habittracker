@@ -2,8 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function SettingsPage() {
+  const { user: authUser, signOut } = useAuth();
+  const router = useRouter();
   const [currentUser] = useState("@camino");
   const [theme, setTheme] = useState("light");
   const [notifications, setNotifications] = useState(true);
@@ -47,6 +51,19 @@ export default function SettingsPage() {
     applyTheme(newTheme);
   };
 
+  // Handle sign out
+  const handleSignOut = async () => {
+    if (confirm('Are you sure you want to sign out?')) {
+      try {
+        await signOut();
+        router.push('/');
+      } catch (error) {
+        console.error('Error signing out:', error);
+        alert('Failed to sign out. Please try again.');
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
       <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-4 md:p-8 w-full max-w-[600px]">
@@ -62,9 +79,17 @@ export default function SettingsPage() {
           <h2 className="text-xs md:text-sm font-semibold text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-3 uppercase tracking-wide">Profile</h2>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-base md:text-lg font-semibold text-[#13343b] dark:text-[#f5f5f5]">{currentUser}</p>
-              <p className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">Active user</p>
+              <p className="text-base md:text-lg font-semibold text-[#13343b] dark:text-[#f5f5f5]">{authUser ? authUser.username : currentUser}</p>
+              <p className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">{authUser ? 'Signed in' : 'Demo user'}</p>
             </div>
+            {authUser && (
+              <button
+                onClick={handleSignOut}
+                className="px-3 md:px-4 py-2 rounded-lg border border-red-200 dark:border-red-900 bg-[#fffffe] dark:bg-[#262828] text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
+              >
+                Sign Out
+              </button>
+            )}
           </div>
         </div>
 
