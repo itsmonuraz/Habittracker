@@ -308,7 +308,7 @@ export default function SocialHabitTracker() {
   const showHabitsPrompt = authUser && user.habits.length > 0 && user.habits.every(h => h.startsWith('Habit '));
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8 relative bg-white dark:bg-[#0a0a0a]">
+    <div className="flex flex-col items-center justify-center min-h-screen p-8 relative bg-[#fcfcf9] dark:bg-[#1f2121]">
       {/* Sign in prompt for non-logged in users */}
       {!authUser && !authLoading && (
         <div className="mb-4 text-center py-3 px-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
@@ -403,12 +403,12 @@ export default function SocialHabitTracker() {
                         `}
                         onClick={() => !isDisabled && toggleHabitCompletion(habit, date)}
                       >
-                        <div className={`w-full h-full rounded transition-all duration-200 relative
-                          ${isCompleted ? 'bg-green-700 dark:bg-green-800' : isFuture ? 'bg-black/10' : 'bg-transparent'}
-                          ${!isDisabled ? 'hover:scale-95 hover:shadow-inner hover:bg-gray-100 dark:hover:bg-gray-700' : ''}
-                          ${isPast && !isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/10 after:pointer-events-none after:rounded' : ''}
-                          ${isPast && isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/20 after:pointer-events-none after:rounded' : ''}
-                        `} />
+                          <div className={`w-full h-full rounded transition-all duration-200 relative
+                            ${isCompleted ? 'bg-green-700 dark:bg-green-800' : isFuture ? 'bg-black/10' : 'bg-transparent'}
+                            ${!isDisabled && !isCompleted ? 'hover:scale-95 hover:shadow-inner hover:bg-gray-100 dark:hover:bg-gray-700' : ''}
+                            ${isPast && !isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/10 after:pointer-events-none after:rounded' : ''}
+                            ${isPast && isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/20 after:pointer-events-none after:rounded' : ''}
+                          `} />
                       </td>
                     );
                   })}
