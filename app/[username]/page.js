@@ -201,7 +201,7 @@ export default function UserProfilePage() {
   
   if (!userExists && !authLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-white dark:bg-[#0a0a0a]">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] mb-4">User not found</h1>
           <Link href="/">
@@ -218,7 +218,7 @@ export default function UserProfilePage() {
   const stats = getYearCompletionStats();
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
+    <div className="flex flex-col items-center min-h-screen p-4 md:p-8 bg-white dark:bg-[#0a0a0a]">
       {/* Header */}
       <div className="w-full max-w-[1400px] mb-1 md:mb-2">
         <div className="flex items-center justify-between gap-4 mb-4">

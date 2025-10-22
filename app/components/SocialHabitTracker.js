@@ -308,7 +308,7 @@ export default function SocialHabitTracker() {
   const showHabitsPrompt = authUser && user.habits.length > 0 && user.habits.every(h => h.startsWith('Habit '));
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8 relative bg-[#fcfcf9] dark:bg-[#1f2121]">
+    <div className="flex flex-col items-center justify-center min-h-screen p-8 relative bg-white dark:bg-[#0a0a0a]">
       {/* Sign in prompt for non-logged in users */}
       {!authUser && !authLoading && (
         <div className="mb-4 text-center py-3 px-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">

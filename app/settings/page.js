@@ -65,7 +65,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-white dark:bg-[#0a0a0a]">
       <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-4 md:p-8 w-full max-w-[600px]">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

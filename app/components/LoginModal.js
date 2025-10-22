@@ -100,11 +100,11 @@ export default function LoginModal({ isOpen, onClose, message }) {
 
   const renderInitialScreen = () => (
     <>
-      <h2 style={{ color: '#fff', fontSize: '24px', marginBottom: '16px', textAlign: 'center' }}>
+      <h2 style={{ color: '#111827', fontSize: '20px', marginBottom: '12px', textAlign: 'center', fontWeight: '600' }}>
         Sign In Required
       </h2>
       
-      <p style={{ color: '#aaa', fontSize: '16px', marginBottom: '24px', textAlign: 'center', lineHeight: '1.5' }}>
+      <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '24px', textAlign: 'center', lineHeight: '1.5' }}>
         {message || "Sign in to track your own habits and sync across devices"}
       </p>
 
@@ -112,13 +112,13 @@ export default function LoginModal({ isOpen, onClose, message }) {
         onClick={handleGoogleSignIn}
         disabled={isLoading}
         style={{
-          width: '100%', padding: '14px', backgroundColor: '#4285f4', color: '#fff',
-          border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: '600',
+          width: '100%', padding: '12px', backgroundColor: '#14532d', color: '#ffffff',
+          border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500',
           cursor: isLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center',
-          justifyContent: 'center', gap: '12px', transition: 'all 0.2s', opacity: isLoading ? 0.7 : 1, marginBottom: '12px'
+          justifyContent: 'center', gap: '10px', transition: 'all 0.2s', opacity: isLoading ? 0.7 : 1, marginBottom: '12px'
         }}
-        onMouseOver={(e) => !isLoading && (e.target.style.backgroundColor = '#357ae8')}
-        onMouseOut={(e) => !isLoading && (e.target.style.backgroundColor = '#4285f4')}
+        onMouseOver={(e) => !isLoading && (e.target.style.backgroundColor = '#15803d')}
+        onMouseOut={(e) => !isLoading && (e.target.style.backgroundColor = '#14532d')}
       >
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
@@ -130,20 +130,20 @@ export default function LoginModal({ isOpen, onClose, message }) {
       </button>
 
       <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
-        <div style={{ flex: 1, height: '1px', backgroundColor: '#333' }}></div>
-        <span style={{ padding: '0 12px', color: '#666', fontSize: '14px' }}>or</span>
-        <div style={{ flex: 1, height: '1px', backgroundColor: '#333' }}></div>
+        <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }}></div>
+        <span style={{ padding: '0 12px', color: '#9ca3af', fontSize: '12px' }}>or</span>
+        <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }}></div>
       </div>
 
       <button
         onClick={() => setScreen('username')}
         style={{
-          width: '100%', padding: '14px', backgroundColor: '#2a2a2a', color: '#fff',
-          border: '1px solid #444', borderRadius: '8px', fontSize: '16px', fontWeight: '600',
+          width: '100%', padding: '12px', backgroundColor: '#f9fafb', color: '#111827',
+          border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '14px', fontWeight: '500',
           cursor: 'pointer', transition: 'all 0.2s', marginBottom: '12px'
         }}
-        onMouseOver={(e) => e.target.style.backgroundColor = '#333'}
-        onMouseOut={(e) => e.target.style.backgroundColor = '#2a2a2a'}
+        onMouseOver={(e) => e.target.style.backgroundColor = '#f3f4f6'}
+        onMouseOut={(e) => e.target.style.backgroundColor = '#f9fafb'}
       >
         Sign up with Email
       </button>
@@ -151,19 +151,22 @@ export default function LoginModal({ isOpen, onClose, message }) {
       <button
         onClick={() => setScreen('login')}
         style={{
-          width: '100%', padding: '12px', backgroundColor: 'transparent', color: '#aaa',
-          border: '1px solid #333', borderRadius: '8px', fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s'
+          width: '100%', padding: '12px', backgroundColor: 'transparent', color: '#6b7280',
+          border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s'
         }}
-        onMouseOver={(e) => { e.target.style.backgroundColor = '#2a2a2a'; e.target.style.color = '#fff'; }}
-        onMouseOut={(e) => { e.target.style.backgroundColor = 'transparent'; e.target.style.color = '#aaa'; }}
+        onMouseOver={(e) => { e.target.style.backgroundColor = '#f9fafb'; e.target.style.color = '#111827'; }}
+        onMouseOut={(e) => { e.target.style.backgroundColor = 'transparent'; e.target.style.color = '#6b7280'; }}
       >
         Already have an account? Sign in
       </button>
 
       <button onClick={onClose} style={{
-        width: '100%', marginTop: '12px', padding: '12px', backgroundColor: 'transparent',
-        color: '#666', border: 'none', fontSize: '12px', cursor: 'pointer'
-      }}>
+        width: '100%', marginTop: '16px', padding: '10px', backgroundColor: 'transparent',
+        color: '#9ca3af', border: 'none', fontSize: '12px', cursor: 'pointer', transition: 'color 0.2s'
+      }}
+      onMouseOver={(e) => e.target.style.color = '#6b7280'}
+      onMouseOut={(e) => e.target.style.color = '#9ca3af'}
+      >
         Continue as guest
       </button>
     </>
@@ -171,15 +174,18 @@ export default function LoginModal({ isOpen, onClose, message }) {
 
   const renderUsernameScreen = () => (
     <>
-      <button onClick={() => setScreen('initial')} style={{ background: 'none', border: 'none', color: '#aaa', fontSize: '20px', cursor: 'pointer', marginBottom: '16px' }}>
+      <button onClick={() => setScreen('initial')} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '18px', cursor: 'pointer', marginBottom: '16px', transition: 'color 0.2s' }}
+      onMouseOver={(e) => e.target.style.color = '#111827'}
+      onMouseOut={(e) => e.target.style.color = '#6b7280'}
+      >
         ← Back
       </button>
       
-      <h2 style={{ color: '#fff', fontSize: '24px', marginBottom: '8px', textAlign: 'center' }}>
+      <h2 style={{ color: '#111827', fontSize: '20px', marginBottom: '8px', textAlign: 'center', fontWeight: '600' }}>
         Choose Your Username
       </h2>
       
-      <p style={{ color: '#aaa', fontSize: '14px', marginBottom: '24px', textAlign: 'center' }}>
+      <p style={{ color: '#6b7280', fontSize: '13px', marginBottom: '24px', textAlign: 'center' }}>
         This will be your public handle (e.g., @camino)
       </p>
 
@@ -190,20 +196,20 @@ export default function LoginModal({ isOpen, onClose, message }) {
           value={username}
           onChange={(e) => setUsername(e.target.value.replace(/[^a-z0-9_]/gi, '').toLowerCase())}
           style={{
-            width: '100%', padding: '14px', backgroundColor: '#2a2a2a', color: '#fff',
-            border: `2px solid ${usernameAvailable === true ? '#34A853' : usernameAvailable === false ? '#EA4335' : '#444'}`,
-            borderRadius: '8px', fontSize: '16px', outline: 'none'
+            width: '100%', padding: '12px', backgroundColor: '#f9fafb', color: '#111827',
+            border: `1px solid ${usernameAvailable === true ? '#15803d' : usernameAvailable === false ? '#dc2626' : '#e5e7eb'}`,
+            borderRadius: '6px', fontSize: '14px', outline: 'none', transition: 'border-color 0.2s'
           }}
           autoFocus
         />
         {usernameChecking && (
-          <p style={{ color: '#aaa', fontSize: '12px', marginTop: '8px' }}>Checking availability...</p>
+          <p style={{ color: '#6b7280', fontSize: '12px', marginTop: '8px' }}>Checking availability...</p>
         )}
         {usernameAvailable === true && (
-          <p style={{ color: '#34A853', fontSize: '12px', marginTop: '8px' }}>✓ @{username} is available!</p>
+          <p style={{ color: '#15803d', fontSize: '12px', marginTop: '8px' }}>✓ @{username} is available!</p>
         )}
         {usernameAvailable === false && (
-          <p style={{ color: '#EA4335', fontSize: '12px', marginTop: '8px' }}>✗ @{username} is already taken</p>
+          <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '8px' }}>✗ @{username} is already taken</p>
         )}
       </div>
 
@@ -211,10 +217,12 @@ export default function LoginModal({ isOpen, onClose, message }) {
         onClick={() => setScreen('signup')}
         disabled={!usernameAvailable || username.length < 3}
         style={{
-          width: '100%', padding: '14px', backgroundColor: usernameAvailable ? '#34A853' : '#444',
-          color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: '600',
-          cursor: usernameAvailable ? 'pointer' : 'not-allowed', opacity: usernameAvailable ? 1 : 0.5
+          width: '100%', padding: '12px', backgroundColor: usernameAvailable ? '#15803d' : '#e5e7eb',
+          color: usernameAvailable ? '#ffffff' : '#9ca3af', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500',
+          cursor: usernameAvailable ? 'pointer' : 'not-allowed', opacity: usernameAvailable ? 1 : 0.6, transition: 'all 0.2s'
         }}
+        onMouseOver={(e) => usernameAvailable && (e.target.style.backgroundColor = '#166534')}
+        onMouseOut={(e) => usernameAvailable && (e.target.style.backgroundColor = '#15803d')}
       >
         Continue
       </button>
@@ -223,15 +231,18 @@ export default function LoginModal({ isOpen, onClose, message }) {
 
   const renderSignupScreen = () => (
     <>
-      <button onClick={() => setScreen('username')} style={{ background: 'none', border: 'none', color: '#aaa', fontSize: '20px', cursor: 'pointer', marginBottom: '16px' }}>
+      <button onClick={() => setScreen('username')} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '18px', cursor: 'pointer', marginBottom: '16px', transition: 'color 0.2s' }}
+      onMouseOver={(e) => e.target.style.color = '#111827'}
+      onMouseOut={(e) => e.target.style.color = '#6b7280'}
+      >
         ← Back
       </button>
       
-      <h2 style={{ color: '#fff', fontSize: '24px', marginBottom: '8px', textAlign: 'center' }}>
+      <h2 style={{ color: '#111827', fontSize: '20px', marginBottom: '8px', textAlign: 'center', fontWeight: '600' }}>
         Complete Your Profile
       </h2>
       
-      <p style={{ color: '#aaa', fontSize: '14px', marginBottom: '24px', textAlign: 'center' }}>
+      <p style={{ color: '#6b7280', fontSize: '13px', marginBottom: '24px', textAlign: 'center' }}>
         Username: @{username}
       </p>
 
@@ -242,8 +253,8 @@ export default function LoginModal({ isOpen, onClose, message }) {
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
           style={{
-            width: '100%', padding: '14px', backgroundColor: '#2a2a2a', color: '#fff',
-            border: '2px solid #444', borderRadius: '8px', fontSize: '16px', marginBottom: '12px', outline: 'none'
+            width: '100%', padding: '12px', backgroundColor: '#f9fafb', color: '#111827',
+            border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '14px', marginBottom: '12px', outline: 'none'
           }}
         />
         
@@ -254,8 +265,8 @@ export default function LoginModal({ isOpen, onClose, message }) {
           onChange={(e) => setEmail(e.target.value)}
           required
           style={{
-            width: '100%', padding: '14px', backgroundColor: '#2a2a2a', color: '#fff',
-            border: '2px solid #444', borderRadius: '8px', fontSize: '16px', marginBottom: '12px', outline: 'none'
+            width: '100%', padding: '12px', backgroundColor: '#f9fafb', color: '#111827',
+            border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '14px', marginBottom: '12px', outline: 'none'
           }}
         />
         
@@ -267,21 +278,23 @@ export default function LoginModal({ isOpen, onClose, message }) {
           required
           minLength={6}
           style={{
-            width: '100%', padding: '14px', backgroundColor: '#2a2a2a', color: '#fff',
-            border: '2px solid #444', borderRadius: '8px', fontSize: '16px', marginBottom: '16px', outline: 'none'
+            width: '100%', padding: '12px', backgroundColor: '#f9fafb', color: '#111827',
+            border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '14px', marginBottom: '16px', outline: 'none'
           }}
         />
 
-        {error && <p style={{ color: '#EA4335', fontSize: '14px', marginBottom: '12px', textAlign: 'center' }}>{error}</p>}
+        {error && <p style={{ color: '#dc2626', fontSize: '13px', marginBottom: '12px', textAlign: 'center' }}>{error}</p>}
 
         <button
           type="submit"
           disabled={isLoading}
           style={{
-            width: '100%', padding: '14px', backgroundColor: '#34A853', color: '#fff',
-            border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: '600',
-            cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.7 : 1
+            width: '100%', padding: '12px', backgroundColor: '#15803d', color: '#ffffff',
+            border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500',
+            cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.7 : 1, transition: 'background-color 0.2s'
           }}
+          onMouseOver={(e) => !isLoading && (e.target.style.backgroundColor = '#166534')}
+          onMouseOut={(e) => !isLoading && (e.target.style.backgroundColor = '#15803d')}
         >
           {isLoading ? 'Creating Account...' : 'Create Account'}
         </button>
@@ -291,11 +304,14 @@ export default function LoginModal({ isOpen, onClose, message }) {
 
   const renderLoginScreen = () => (
     <>
-      <button onClick={() => setScreen('initial')} style={{ background: 'none', border: 'none', color: '#aaa', fontSize: '20px', cursor: 'pointer', marginBottom: '16px' }}>
+      <button onClick={() => setScreen('initial')} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '18px', cursor: 'pointer', marginBottom: '16px', transition: 'color 0.2s' }}
+      onMouseOver={(e) => e.target.style.color = '#111827'}
+      onMouseOut={(e) => e.target.style.color = '#6b7280'}
+      >
         ← Back
       </button>
       
-      <h2 style={{ color: '#fff', fontSize: '24px', marginBottom: '24px', textAlign: 'center' }}>
+      <h2 style={{ color: '#111827', fontSize: '20px', marginBottom: '24px', textAlign: 'center', fontWeight: '600' }}>
         Welcome Back
       </h2>
 
@@ -307,8 +323,8 @@ export default function LoginModal({ isOpen, onClose, message }) {
           onChange={(e) => setEmail(e.target.value)}
           required
           style={{
-            width: '100%', padding: '14px', backgroundColor: '#2a2a2a', color: '#fff',
-            border: '2px solid #444', borderRadius: '8px', fontSize: '16px', marginBottom: '12px', outline: 'none'
+            width: '100%', padding: '12px', backgroundColor: '#f9fafb', color: '#111827',
+            border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '14px', marginBottom: '12px', outline: 'none'
           }}
         />
         
@@ -319,29 +335,34 @@ export default function LoginModal({ isOpen, onClose, message }) {
           onChange={(e) => setPassword(e.target.value)}
           required
           style={{
-            width: '100%', padding: '14px', backgroundColor: '#2a2a2a', color: '#fff',
-            border: '2px solid #444', borderRadius: '8px', fontSize: '16px', marginBottom: '16px', outline: 'none'
+            width: '100%', padding: '12px', backgroundColor: '#f9fafb', color: '#111827',
+            border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '14px', marginBottom: '16px', outline: 'none'
           }}
         />
 
-        {error && <p style={{ color: '#EA4335', fontSize: '14px', marginBottom: '12px', textAlign: 'center' }}>{error}</p>}
+        {error && <p style={{ color: '#dc2626', fontSize: '13px', marginBottom: '12px', textAlign: 'center' }}>{error}</p>}
 
         <button
           type="submit"
           disabled={isLoading}
           style={{
-            width: '100%', padding: '14px', backgroundColor: '#4285f4', color: '#fff',
-            border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: '600',
-            cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.7 : 1
+            width: '100%', padding: '12px', backgroundColor: '#15803d', color: '#ffffff',
+            border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500',
+            cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.7 : 1, transition: 'background-color 0.2s'
           }}
+          onMouseOver={(e) => !isLoading && (e.target.style.backgroundColor = '#166534')}
+          onMouseOut={(e) => !isLoading && (e.target.style.backgroundColor = '#15803d')}
         >
           {isLoading ? 'Signing In...' : 'Sign In'}
         </button>
       </form>
 
-      <p style={{ color: '#666', fontSize: '12px', marginTop: '16px', textAlign: 'center' }}>
+      <p style={{ color: '#9ca3af', fontSize: '12px', marginTop: '16px', textAlign: 'center' }}>
         Don&apos;t have an account?{' '}
-        <span onClick={() => setScreen('username')} style={{ color: '#4285f4', cursor: 'pointer', textDecoration: 'underline' }}>
+        <span onClick={() => setScreen('username')} style={{ color: '#15803d', cursor: 'pointer', textDecoration: 'underline', transition: 'color 0.2s' }}
+        onMouseOver={(e) => e.target.style.color = '#166534'}
+        onMouseOut={(e) => e.target.style.color = '#15803d'}
+        >
           Sign up
         </span>
       </p>
@@ -352,16 +373,16 @@ export default function LoginModal({ isOpen, onClose, message }) {
     <div 
       style={{
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center',
-        justifyContent: 'center', zIndex: 1000
+        backgroundColor: 'rgba(0, 0, 0, 0.75)', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)'
       }}
       onClick={onClose}
     >
       <div 
         style={{
-          backgroundColor: '#1a1a1a', borderRadius: '12px', padding: '40px',
-          maxWidth: '400px', width: '90%', boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
-          border: '1px solid #333', maxHeight: '90vh', overflowY: 'auto'
+          backgroundColor: '#ffffff', borderRadius: '8px', padding: '32px',
+          maxWidth: '400px', width: '90%', boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6)',
+          border: '1px solid #e5e7eb', maxHeight: '90vh', overflowY: 'auto'
         }}
         onClick={(e) => e.stopPropagation()}
       >

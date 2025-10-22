@@ -16,7 +16,7 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-white dark:bg-[#0a0a0a]">
 
       {/* About Content */}
       <div className="w-full max-w-[800px]">

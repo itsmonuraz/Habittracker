@@ -159,7 +159,7 @@ export default function CommunityPage() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
+    <div className="flex flex-col items-center min-h-screen p-4 md:p-8 bg-white dark:bg-[#0a0a0a]">
       {/* Header */}
       <div className="w-full max-w-6xl mb-6 md:mb-8">
         <div className="flex items-center justify-between gap-4 mb-4">
