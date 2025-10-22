@@ -67,7 +67,7 @@ export default function UserProfilePage() {
   const params = useParams();
   const username = params.username ? `@${params.username}` : "@camino";
   const { user: authUser, loading: authLoading } = useAuth();
-  const { getHabitsForMonth, updateHabitName, addHabitToMonth, isCompleted: isHabitCompletedInContext, productiveHours, updateProductiveHours, getProductiveHours } = useHabits();
+  const { getHabitsForMonth, updateHabitName, addHabitToMonth, deleteHabitFromMonth, isCompleted: isHabitCompletedInContext, productiveHours, updateProductiveHours, getProductiveHours } = useHabits();
   
   const [isDarkMode, setIsDarkMode] = useState(false);
   const dateRange = generateYearDateRange(2025);
@@ -75,6 +75,9 @@ export default function UserProfilePage() {
   // State for editing habit names - format: "monthKey-habitIndex"
   const [editingHabit, setEditingHabit] = useState(null);
   const [editingValue, setEditingValue] = useState('');
+  
+  // State for context menu
+  const [contextMenu, setContextMenu] = useState(null);
   
   // Check if viewing own profile
   const isOwnProfile = authUser && username === authUser.username;
@@ -176,6 +179,36 @@ export default function UserProfilePage() {
     addHabitToMonth(monthKey);
   };
 
+  // Handle right-click context menu
+  const handleContextMenu = (e, monthKey, index, habitName) => {
+    if (!isOwnProfile) return;
+    e.preventDefault();
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      monthKey,
+      index,
+      habitName
+    });
+  };
+
+  // Handle delete from context menu
+  const handleDeleteHabit = () => {
+    if (contextMenu) {
+      deleteHabitFromMonth(contextMenu.monthKey, contextMenu.index);
+      setContextMenu(null);
+    }
+  };
+
+  // Close context menu when clicking elsewhere
+  useEffect(() => {
+    const handleClick = () => setContextMenu(null);
+    if (contextMenu) {
+      document.addEventListener('click', handleClick);
+      return () => document.removeEventListener('click', handleClick);
+    }
+  }, [contextMenu]);
+
   const getYearCompletionStats = () => {
     let totalCompleted = 0;
     let totalPossible = 0;
@@ -201,7 +234,7 @@ export default function UserProfilePage() {
   
   if (!userExists && !authLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-white dark:bg-[#0a0a0a]">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] mb-4">User not found</h1>
           <Link href="/">
@@ -218,7 +251,7 @@ export default function UserProfilePage() {
   const stats = getYearCompletionStats();
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-4 md:p-8 bg-white dark:bg-[#0a0a0a]">
+    <div className="flex flex-col items-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
       {/* Header */}
       <div className="w-full max-w-[1400px] mb-1 md:mb-2">
         <div className="flex items-center justify-between gap-4 mb-4">
@@ -311,8 +344,9 @@ export default function UserProfilePage() {
                           ) : (
                             <span
                               onClick={() => isOwnProfile && startEditingHabit(`${monthKey}-${habitIndex}`, habit, monthKey, habitIndex)}
+                              onContextMenu={(e) => handleContextMenu(e, monthKey, habitIndex, habit)}
                               className={isOwnProfile ? 'cursor-pointer hover:text-green-700 dark:hover:text-green-400 transition-colors' : ''}
-                              title={isOwnProfile ? 'Click to edit' : ''}
+                              title={isOwnProfile ? 'Click to edit | Right-click to delete' : ''}
                             >
                               {habit}
                             </span>
@@ -598,6 +632,26 @@ export default function UserProfilePage() {
           {isDarkMode ? 'Light' : 'Dark'}
         </button>
       </div>
+
+      {/* Context Menu for Deleting Habits */}
+      {contextMenu && (
+        <div
+          style={{
+            position: 'fixed',
+            top: contextMenu.y,
+            left: contextMenu.x,
+            zIndex: 1000,
+          }}
+          className="bg-white dark:bg-[#1a1a1a] border border-[#e5e7eb] dark:border-[#333333] rounded shadow-sm"
+        >
+          <button
+            onClick={handleDeleteHabit}
+            className="block px-2 py-0.5 text-[10px] text-[#4b5563] dark:text-[#9ca3af] hover:text-[#111827] dark:hover:text-[#f5f5f5] underline transition-colors whitespace-nowrap"
+          >
+            delete
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -132,6 +132,34 @@ export function HabitsProvider({ children }) {
     });
   };
 
+  // Delete a habit from a specific month
+  const deleteHabitFromMonth = (monthKey, index) => {
+    const habitToDelete = habitsByMonth[monthKey]?.[index];
+    if (!habitToDelete) return;
+
+    setHabitsByMonth(prev => {
+      const newHabits = { ...prev };
+      if (newHabits[monthKey]) {
+        newHabits[monthKey] = newHabits[monthKey].filter((_, i) => i !== index);
+      }
+      return newHabits;
+    });
+
+    // Remove all completions for this habit in this month
+    setCompletions(prev => {
+      const updatedCompletions = {};
+      Object.keys(prev).forEach(date => {
+        if (date.startsWith(monthKey)) {
+          // Remove the deleted habit from this date's completions
+          updatedCompletions[date] = prev[date].filter(h => h !== habitToDelete);
+        } else {
+          updatedCompletions[date] = prev[date];
+        }
+      });
+      return updatedCompletions;
+    });
+  };
+
   // Toggle habit completion for a specific date
   const toggleCompletion = (date, habit) => {
     setCompletions(prev => {
@@ -176,6 +204,7 @@ export function HabitsProvider({ children }) {
     getHabitsForMonth,
     updateHabitName,
     addHabitToMonth,
+    deleteHabitFromMonth,
     toggleCompletion,
     isCompleted,
     productiveHours,
