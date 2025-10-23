@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // output: 'export', // Disabled for dynamic routing - re-enable when connecting backend with proper SSG
+  output: 'export', // Static export for GitHub Pages
   images: {
     unoptimized: true,
   },
