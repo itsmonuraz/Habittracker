@@ -102,7 +102,7 @@ const motivationalReminders = [
 ];
 
 export default function SocialHabitTracker() {
-  const { user: authUser, loading: authLoading } = useAuth();
+  const { user: authUser, loading: authLoading, signOut } = useAuth();
   const { getHabitsForMonth, toggleCompletion, isCompleted: isHabitCompletedInContext, productiveHours, updateProductiveHours, getProductiveHours } = useHabits();
   
   // Get current month for habits
@@ -164,6 +164,9 @@ export default function SocialHabitTracker() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loginMessage, setLoginMessage] = useState('');
   
+  // Dropdown menu state
+  const [showDropdown, setShowDropdown] = useState(false);
+  
   // State for current motivational reminder - start with first one to avoid hydration mismatch
   const [currentReminder, setCurrentReminder] = useState(motivationalReminders[0]);
   const [isClient, setIsClient] = useState(false);
@@ -186,6 +189,18 @@ export default function SocialHabitTracker() {
     
     return () => clearInterval(interval);
   }, [isClient]);
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showDropdown && !event.target.closest('.user-dropdown')) {
+        setShowDropdown(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showDropdown]);
 
   // Format date for display - just return the day number
   const formatDateHeader = (dateStr) => {
@@ -313,7 +328,7 @@ export default function SocialHabitTracker() {
     <div className="flex flex-col items-center justify-center min-h-screen p-8 relative bg-[#fcfcf9] dark:bg-[#1f2121]">
       {/* Sign in prompt for non-logged in users */}
       {!authUser && !authLoading && (
-        <div className="mb-4 text-center py-3 px-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700">
+        <div className="mb-4 text-center py-3 px-4">
           <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
             This is only demo data
           </p>
@@ -354,14 +369,6 @@ export default function SocialHabitTracker() {
           </div>
         )}
         
-        {/* Prompt to customize habits */}
-        {showHabitsPrompt && !showEmptyState && (
-          <div className="mb-4 text-center py-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-            <p className="text-xs text-green-800 dark:text-green-300">
-              Click on your <Link href={`/${currentUser.replace('@', '')}`} className="underline font-semibold">username</Link> to customize your habit names
-            </p>
-          </div>
-        )}
 
         {/* Desktop Table */}
         {!showEmptyState && (
@@ -546,11 +553,79 @@ export default function SocialHabitTracker() {
 
         {/* Mobile Navigation - Below Table */}
         <div className="md:hidden mt-6 flex justify-between items-center px-2">
-          <Link href={`/${currentUser.replace('@', '')}`}>
-            <div className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
+          <div className="relative user-dropdown">
+            <div 
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors"
+            >
               {currentUser}
             </div>
-          </Link>
+            
+            {showDropdown && (
+              <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-[#262828] border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] rounded-lg shadow-lg py-1 min-w-[140px] z-50">
+                {authUser ? (
+                  <>
+                    <Link href={`/${currentUser.replace('@', '')}`}>
+                      <div 
+                        onClick={() => setShowDropdown(false)}
+                        className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                      >
+                        Profile
+                      </div>
+                    </Link>
+                    <Link href="/settings">
+                      <div 
+                        onClick={() => setShowDropdown(false)}
+                        className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                      >
+                        Settings
+                      </div>
+                    </Link>
+                    <Link href="/about">
+                      <div 
+                        onClick={() => setShowDropdown(false)}
+                        className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                      >
+                        About
+                      </div>
+                    </Link>
+                    <div className="border-t border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] my-1"></div>
+                    <div 
+                      onClick={() => {
+                        signOut();
+                        setShowDropdown(false);
+                      }}
+                      className="px-3 py-1.5 text-[10px] text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    >
+                      Sign out
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/about">
+                      <div 
+                        onClick={() => setShowDropdown(false)}
+                        className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                      >
+                        About
+                      </div>
+                    </Link>
+                    <div className="border-t border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] my-1"></div>
+                    <div 
+                      onClick={() => {
+                        setLoginMessage("Sign in to track your own habits and save your progress");
+                        setShowLoginModal(true);
+                        setShowDropdown(false);
+                      }}
+                      className="px-3 py-1.5 text-[10px] text-green-700 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    >
+                      Sign in
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
 
           <Link href="/community">
             <div className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
@@ -568,11 +643,79 @@ export default function SocialHabitTracker() {
       </div>
 
       {/* Desktop Navigation - Fixed Position */}
-      <Link href={`/${currentUser.replace('@', '')}`}>
-        <div className="hidden md:block fixed bottom-6 left-6 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors">
+      <div className="relative user-dropdown">
+        <div 
+          onClick={() => setShowDropdown(!showDropdown)}
+          className="hidden md:block fixed bottom-6 left-6 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors"
+        >
           {currentUser}
         </div>
-      </Link>
+        
+        {showDropdown && (
+          <div className="hidden md:block fixed bottom-14 left-6 bg-white dark:bg-[#262828] border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] rounded-lg shadow-lg py-1 min-w-[140px] z-50">
+            {authUser ? (
+              <>
+                <Link href={`/${currentUser.replace('@', '')}`}>
+                  <div 
+                    onClick={() => setShowDropdown(false)}
+                    className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  >
+                    Profile
+                  </div>
+                </Link>
+                <Link href="/settings">
+                  <div 
+                    onClick={() => setShowDropdown(false)}
+                    className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  >
+                    Settings
+                  </div>
+                </Link>
+                <Link href="/about">
+                  <div 
+                    onClick={() => setShowDropdown(false)}
+                    className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  >
+                    About
+                  </div>
+                </Link>
+                <div className="border-t border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] my-1"></div>
+                <div 
+                  onClick={() => {
+                    signOut();
+                    setShowDropdown(false);
+                  }}
+                  className="px-3 py-1.5 text-[10px] text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                >
+                  Sign out
+                </div>
+              </>
+            ) : (
+              <>
+                <Link href="/about">
+                  <div 
+                    onClick={() => setShowDropdown(false)}
+                    className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  >
+                    About
+                  </div>
+                </Link>
+                <div className="border-t border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] my-1"></div>
+                <div 
+                  onClick={() => {
+                    setLoginMessage("Sign in to track your own habits and save your progress");
+                    setShowLoginModal(true);
+                    setShowDropdown(false);
+                  }}
+                  className="px-3 py-1.5 text-[10px] text-green-700 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                >
+                  Sign in
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
 
       <Link href="/community">
         <button 
