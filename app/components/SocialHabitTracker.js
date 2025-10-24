@@ -720,16 +720,11 @@ export default function SocialHabitTracker() {
       </div>
 
       <Link href="/community">
-        <button 
-          className="hidden md:flex fixed top-6 right-6 border-none rounded-lg p-3 font-medium cursor-pointer transition-all duration-250 items-center justify-center"
+        <div 
+          className="hidden md:block fixed bottom-6 right-6 text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors"
         >
-          <Image 
-            src="/social2.svg" 
-            alt="View Others" 
-            width={20} 
-            height={20}
-          />
-        </button>
+          Community
+        </div>
       </Link>
       
       {/* Login Modal */}

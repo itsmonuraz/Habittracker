@@ -163,11 +163,13 @@ export default function CommunityPage() {
       {/* Header */}
       <div className="w-full max-w-6xl mb-6 md:mb-8">
         <div className="flex items-center justify-between gap-4 mb-4">
-          <Link href="/">
-            <h1 className="text-lg md:text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] hover:text-green-900 dark:hover:text-[#f5f5f5] transition-colors cursor-pointer flex-1">
-              <span className="hidden md:inline">Community Habits - {getCurrentMonthYear()}</span>
-              <span className="md:hidden">Community - {getCurrentMonthYear()}</span>
-            </h1>
+
+          <h1 className="text-lg md:text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] hover:text-green-900 dark:hover:text-[#f5f5f5] transition-colors cursor-pointer flex-1">
+            <span className="hidden md:inline">Community Habits - {getCurrentMonthYear()}</span>
+            <span className="md:hidden">Community - {getCurrentMonthYear()}</span>
+          </h1>
+                    <Link href="/" className="text-xs text-green-700 dark:text-green-400 hover:underline font-medium mr-2">
+              Back
           </Link>
         </div>
       </div>

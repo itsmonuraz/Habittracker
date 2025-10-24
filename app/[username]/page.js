@@ -304,15 +304,7 @@ export default function UserProfilePage({ usernameFromHash = null }) {
             </h2>
           </div>
           
-          {/* Editing hint for own profile */}
-          {isOwnProfile && (
-            <div className="mb-4 text-center py-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-              <p className="text-xs text-green-800 dark:text-green-300">
-                Click on any habit name to edit it || Click <strong>+</strong> to add habits to each month
-              </p>
-            </div>
-          )}
-          
+
           {/* Desktop Table */}
           <div className="overflow-x-auto hidden md:block">
             <table className="w-full border-collapse min-w-max">
@@ -577,10 +569,10 @@ export default function UserProfilePage({ usernameFromHash = null }) {
                         {isOwnProfile ? (
                           <button
                             onClick={() => handleAddHabitToMonth(monthKey)}
-                            className="text-[10px] px-1.5 py-0.5 bg-green-700 hover:bg-green-800 dark:bg-green-800 dark:hover:bg-green-700 text-white rounded transition-colors font-medium"
+                            className="text-xs  hover:text-gray-600 font-sm"
                             title="Add new habit to this month"
                           >
-                            + Add
+                            +
                           </button>
                         ) : (
                           <span>{/* Empty cell for hours row */}</span>
