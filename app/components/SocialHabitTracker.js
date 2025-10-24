@@ -173,11 +173,13 @@ export default function SocialHabitTracker() {
   // Editing habit state
   const [editingHabitIndex, setEditingHabitIndex] = useState(null);
   const [editingHabitValue, setEditingHabitValue] = useState('');
-  const [hoveredHabitIndex, setHoveredHabitIndex] = useState(null);
   
   // State for current motivational reminder - start with first one to avoid hydration mismatch
   const [currentReminder, setCurrentReminder] = useState(motivationalReminders[0]);
   const [isClient, setIsClient] = useState(false);
+  
+  // State for context menu
+  const [contextMenu, setContextMenu] = useState(null);
   
   // Initialize theme from localStorage
   useEffect(() => {
@@ -372,22 +374,36 @@ export default function SocialHabitTracker() {
     }
   };
 
+  // Handle right-click context menu
+  const handleContextMenu = (e, habitIndex, habitName) => {
+    if (!authUser) return;
+    if (viewingUser !== currentUser) return;
+    
+    e.preventDefault();
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      habitIndex,
+      habitName
+    });
+  };
+
   // Handle habit deletion
-  const handleDeleteHabit = (habitIndex, habitName) => {
-    // If not logged in, show login modal
-    if (!authUser) {
-      setLoginMessage("Sign in to manage your habits");
-      setShowLoginModal(true);
-      return;
-    }
-    
-    if (viewingUser !== currentUser) return; // Read-only mode
-    
-    if (confirm(`Are you sure you want to delete "${habitName}"?`)) {
-      deleteHabitFromMonth(currentMonthKey, habitIndex);
-      setHoveredHabitIndex(null);
+  const handleDeleteHabit = () => {
+    if (contextMenu) {
+      deleteHabitFromMonth(currentMonthKey, contextMenu.habitIndex);
+      setContextMenu(null);
     }
   };
+
+  // Close context menu when clicking elsewhere
+  useEffect(() => {
+    const handleClick = () => setContextMenu(null);
+    if (contextMenu) {
+      document.addEventListener('click', handleClick);
+      return () => document.removeEventListener('click', handleClick);
+    }
+  }, [contextMenu]);
 
   const isViewingOthers = viewingUser !== currentUser;
   
@@ -507,8 +523,6 @@ export default function SocialHabitTracker() {
                 <tr key={habitIndex}>
                   <td 
                     className="text-left text-xs py-1 px-2 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[180px] max-w-[150px]"
-                    onMouseEnter={() => isClient && !isViewingOthers && authUser && setHoveredHabitIndex(habitIndex)}
-                    onMouseLeave={() => setHoveredHabitIndex(null)}
                   >
                     {editingHabitIndex === habitIndex ? (
                       <input
@@ -521,27 +535,12 @@ export default function SocialHabitTracker() {
                         className="w-full bg-transparent border-none outline-none focus:ring-1 focus:ring-green-600 rounded px-1 text-[#13343b] dark:text-[#f5f5f5]"
                       />
                     ) : (
-                      <div className="flex items-center justify-between gap-1 group">
-                        <div
-                          onClick={() => isClient && handleHabitNameClick(habitIndex, habit)}
-                          className={`flex-1 ${isClient && !authUser || isViewingOthers ? 'cursor-default' : isClient ? 'cursor-text hover:bg-gray-100 dark:hover:bg-gray-700' : ''} rounded px-1 py-0.5 transition-colors`}
-                        >
-                          {habit}
-                        </div>
-                        {isClient && authUser && !isViewingOthers && hoveredHabitIndex === habitIndex && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteHabit(habitIndex, habit);
-                            }}
-                            className="text-green-700 dark:text-green-600 hover:text-green-900 dark:hover:text-green-400 transition-colors p-0.5 rounded hover:bg-green-50 dark:hover:bg-green-900/20"
-                            title="Delete habit"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
-                          </button>
-                        )}
+                      <div
+                        onClick={() => isClient && handleHabitNameClick(habitIndex, habit)}
+                        onContextMenu={(e) => isClient && handleContextMenu(e, habitIndex, habit)}
+                        className={`flex-1 ${isClient && !authUser || isViewingOthers ? 'cursor-default' : isClient ? 'cursor-text' : ''} rounded px-1 py-0.5`}
+                      >
+                        {habit}
                       </div>
                     )}
                   </td>
@@ -625,9 +624,6 @@ export default function SocialHabitTracker() {
                   <th 
                     key={index} 
                     className="border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] min-w-[28px] w-7 sticky top-0 z-10 bg-[#fffffe] dark:bg-[#262828] py-2"
-                    onMouseEnter={() => isClient && !isViewingOthers && authUser && setHoveredHabitIndex(index)}
-                    onMouseLeave={() => setHoveredHabitIndex(null)}
-                    onClick={() => isClient && !isViewingOthers && authUser && setHoveredHabitIndex(hoveredHabitIndex === index ? null : index)}
                   >
                     <div className="flex flex-col items-center justify-center h-full gap-1">
                       {editingHabitIndex === index ? (
@@ -642,32 +638,17 @@ export default function SocialHabitTracker() {
                           style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}
                         />
                       ) : (
-                        <>
-                          <span 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              isClient && handleHabitNameClick(index, habit);
-                            }}
-                            className={`text-[10px] text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium whitespace-nowrap ${isClient && !authUser || isViewingOthers ? 'cursor-default' : isClient ? 'cursor-text hover:bg-gray-100 dark:hover:bg-gray-700' : ''} rounded px-0.5 transition-colors`}
-                            style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}
-                          >
-                            {habit}
-                          </span>
-                          {isClient && authUser && !isViewingOthers && hoveredHabitIndex === index && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteHabit(index, habit);
-                              }}
-                              className="text-green-700 dark:text-green-600 hover:text-green-900 dark:hover:text-green-400 transition-colors p-0.5 rounded hover:bg-green-50 dark:hover:bg-green-900/20"
-                              title="Delete habit"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                              </svg>
-                            </button>
-                          )}
-                        </>
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            isClient && handleHabitNameClick(index, habit);
+                          }}
+                          onContextMenu={(e) => isClient && handleContextMenu(e, index, habit)}
+                          className={`text-[10px] text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium whitespace-nowrap ${isClient && !authUser || isViewingOthers ? 'cursor-default' : isClient ? 'cursor-text' : ''} rounded px-0.5`}
+                          style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}
+                        >
+                          {habit}
+                        </span>
                       )}
                     </div>
                   </th>
@@ -965,6 +946,26 @@ export default function SocialHabitTracker() {
         onClose={() => setShowLoginModal(false)}
         message={loginMessage}
       />
+
+      {/* Context Menu for Deleting Habits */}
+      {contextMenu && (
+        <div
+          style={{
+            position: 'fixed',
+            top: contextMenu.y,
+            left: contextMenu.x,
+            zIndex: 1000,
+          }}
+          className="bg-white dark:bg-[#1a1a1a] border border-[#e5e7eb] dark:border-[#333333] rounded shadow-sm"
+        >
+          <button
+            onClick={handleDeleteHabit}
+            className="block px-2 py-0.5 text-[10px] text-[#4b5563] dark:text-[#9ca3af] hover:text-[#111827] dark:hover:text-[#f5f5f5] underline transition-colors whitespace-nowrap"
+          >
+            delete habit
+          </button>
+        </div>
+      )}
     </div>
   );
 }

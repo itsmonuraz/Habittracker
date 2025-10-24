@@ -669,7 +669,7 @@ export default function UserProfilePage({ usernameFromHash = null }) {
             onClick={handleDeleteHabit}
             className="block px-2 py-0.5 text-[10px] text-[#4b5563] dark:text-[#9ca3af] hover:text-[#111827] dark:hover:text-[#f5f5f5] underline transition-colors whitespace-nowrap"
           >
-            delete
+            delete habbit
           </button>
         </div>
       )}
