@@ -105,7 +105,7 @@ export function HabitsProvider({ children }) {
       if (oldName) {
         const updatedCompletions = {};
         Object.keys(completions).forEach(date => {
-          // Only update dates in the same month
+          // Only update dates in the tie month
           if (date.startsWith(monthKey)) {
             updatedCompletions[date] = completions[date].map(habit => 
               habit === oldName ? newName.trim() : habit

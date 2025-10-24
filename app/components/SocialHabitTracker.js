@@ -51,7 +51,7 @@ const userData = {
       "2025-10-15": ["5K run", "Practice guitar"]
     }
   },
-  "@sam": {
+  "@ti": {
     habits: ["Yoga", "Learn Spanish", "Cook dinner", "Walk dog", "Sleep by 10pm"],
     completions: {
       "2025-10-01": ["Yoga", "Learn Spanish", "Walk dog", "Sleep by 10pm"],
@@ -565,14 +565,15 @@ export default function SocialHabitTracker() {
               <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-[#262828] border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] rounded-lg shadow-lg py-1 min-w-[140px] z-50">
                 {authUser ? (
                   <>
-                    <Link href={`/${currentUser.replace('@', '')}`}>
-                      <div 
-                        onClick={() => setShowDropdown(false)}
-                        className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                      >
-                        Profile
-                      </div>
-                    </Link>
+                    <div 
+                      onClick={() => {
+                        window.location.href = `/#${currentUser.replace('@', '')}`;
+                        setShowDropdown(false);
+                      }}
+                      className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    >
+                      Profile
+                    </div>
                     <Link href="/settings">
                       <div 
                         onClick={() => setShowDropdown(false)}
@@ -655,14 +656,15 @@ export default function SocialHabitTracker() {
           <div className="hidden md:block fixed bottom-14 left-6 bg-white dark:bg-[#262828] border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] rounded-lg shadow-lg py-1 min-w-[140px] z-50">
             {authUser ? (
               <>
-                <Link href={`/${currentUser.replace('@', '')}`}>
-                  <div 
-                    onClick={() => setShowDropdown(false)}
-                    className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                  >
-                    Profile
-                  </div>
-                </Link>
+                <div 
+                  onClick={() => {
+                    window.location.href = `/#${currentUser.replace('@', '')}`;
+                    setShowDropdown(false);
+                  }}
+                  className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                >
+                  Profile
+                </div>
                 <Link href="/settings">
                   <div 
                     onClick={() => setShowDropdown(false)}

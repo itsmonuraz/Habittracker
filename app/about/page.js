@@ -20,18 +20,25 @@ export default function AboutPage() {
 
       {/* About Content */}
       <div className="w-full max-w-[800px]">
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-1 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#14532d] dark:hover:text-[#f5f5f5] transition-colors mb-4"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+          </svg>
+          Back
+        </Link>
         <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-8">
-          <Link href="/">
           <h2 className="text-[#14532d] text-2xl md:text-3xl font-bold dark:text-[#f5f5f5] mb-6">
             About Camino
           </h2>
-          </Link>
           <div className="space-y-6 text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">
             <p className="text-base leading-relaxed">
              Camino is nothing but a Habit Tracker, designed to be minialistic and straight to the point.
             <br/>
             <br/>
-             You can tick your completed habits within the same day. Passed days or future days cannot be modified,
+             You can tick your completed habits within the tie day. Passed days or future days cannot be modified,
              ensuring that your habit tracking remains accurate and honest.
             <br/>
             <br/>

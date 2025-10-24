@@ -6,6 +6,8 @@ import { useParams } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { useHabits } from '../contexts/HabitsContext';
 
+// This component can be called either from the dynamic route OR from hash-based routing
+
 // Demo user data for non-logged in users
 const demoUserData = {
   "@camino": {
@@ -63,9 +65,13 @@ const getCurrentDate = () => {
 
 const currentDate = getCurrentDate();
 
-export default function UserProfilePage() {
+export default function UserProfilePage({ usernameFromHash = null }) {
   const params = useParams();
-  const username = params.username ? `@${params.username}` : "@camino";
+  
+  // Determine username source: hash-based (when called from home) or route param (when using dynamic route)
+  const usernameParam = usernameFromHash || params?.username;
+  const username = usernameParam ? (usernameParam.startsWith('@') ? usernameParam : `@${usernameParam}`) : "@camino";
+  
   const { user: authUser, loading: authLoading } = useAuth();
   const { getHabitsForMonth, updateHabitName, addHabitToMonth, deleteHabitFromMonth, isCompleted: isHabitCompletedInContext, productiveHours, updateProductiveHours, getProductiveHours } = useHabits();
   
@@ -81,6 +87,16 @@ export default function UserProfilePage() {
   
   // Check if viewing own profile
   const isOwnProfile = authUser && username === authUser.username;
+
+  // Debug logging
+  useEffect(() => {
+    console.log('🔍 UserProfilePage Debug:', {
+      username,
+      authUser: authUser?.username,
+      isOwnProfile,
+      authLoading
+    });
+  }, [username, authUser, isOwnProfile, authLoading]);
 
   // Initialize dark mode from localStorage or system preference
   useEffect(() => {
@@ -232,16 +248,28 @@ export default function UserProfilePage() {
   // Check if user exists - allow logged-in users to view their own profile even if not in demo data
   const userExists = demoUserData[username] || (authUser && username === authUser.username);
   
+  // Show loading state while auth is initializing
+  if (authLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
+        <div className="text-center">
+          <p className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
   if (!userExists && !authLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] mb-4">User not found</h1>
-          <Link href="/">
-            <button className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors">
-              Go back home
-            </button>
-          </Link>
+          <button 
+            onClick={() => window.location.href = '/'}
+            className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#13343b] dark:hover:text-[#f5f5f5] cursor-pointer transition-colors bg-transparent border-none"
+          >
+            Go back home
+          </button>
         </div>
       </div>
     );
@@ -255,11 +283,12 @@ export default function UserProfilePage() {
       {/* Header */}
       <div className="w-full max-w-[1400px] mb-1 md:mb-2">
         <div className="flex items-center justify-between gap-4 mb-4">
-          <Link href="/">
-            <h1 className="text-lg md:text-2xl font-bold text-[#13343b] dark:text-[#6f7171] hover:text-[#14532d] dark:hover:text-[#9a9a9a]  transition-colors cursor-pointer">
-              {username}
-            </h1>
-          </Link>
+          <h1 
+            onClick={() => window.location.href = '/'}
+            className="text-lg md:text-2xl font-bold text-[#13343b] dark:text-[#6f7171] hover:text-[#14532d] dark:hover:text-[#9a9a9a]  transition-colors cursor-pointer"
+          >
+            {username}
+          </h1>
           <div className="text-sm font-medium text-[#13343b] dark:text-[#6f7171]">
             {stats.completed}/{stats.total}
           </div>

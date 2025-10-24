@@ -66,12 +66,20 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-[#fcfcf9] dark:bg-[#1f2121]">
-      <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-4 md:p-8 w-full max-w-[600px]">
+      <div className="w-full max-w-[600px]">
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-1 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] hover:text-[#14532d] dark:hover:text-[#f5f5f5] transition-colors mb-4"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+          </svg>
+          Back
+        </Link>
+      <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-4 md:p-8 w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Link href="/">
-            <h1 className="text-xl md:text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] transition-colors cursor-pointer">Settings</h1>
-          </Link>
+          <h1 className="text-xl md:text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] transition-colors">Settings</h1>
         </div>
 
         {/* User Info Section */}
@@ -148,6 +156,7 @@ export default function SettingsPage() {
             </button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

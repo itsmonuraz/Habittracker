@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-// User data stored in memory (same as main component)
+// User data stored in memory (tie as main component)
 const userData = {
   "@camino": {
     habits: ["Morning Meditation", "Exercise", "Read 30min", "Drink 8 glasses water", "No social media before 6pm"],
@@ -46,7 +46,7 @@ const userData = {
       "2025-10-15": ["5K run", "Practice guitar"]
     }
   },
-  "@sam": {
+  "@ti": {
     habits: ["Yoga", "Learn Spanish", "Cook dinner", "Walk dog", "Sleep by 10pm"],
     completions: {
       "2025-10-01": ["Yoga", "Learn Spanish", "Walk dog", "Sleep by 10pm"],
