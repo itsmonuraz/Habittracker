@@ -17,8 +17,32 @@ const AuthContext = createContext({});
 export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    // Initialize from localStorage to prevent flicker
+    if (typeof window !== 'undefined') {
+      const savedUser = localStorage.getItem('authUser');
+      if (savedUser) {
+        try {
+          return JSON.parse(savedUser);
+        } catch (e) {
+          console.error('Failed to parse saved user:', e);
+        }
+      }
+    }
+    return null;
+  });
   const [loading, setLoading] = useState(true);
+
+  // Save user to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (user) {
+        localStorage.setItem('authUser', JSON.stringify(user));
+      } else {
+        localStorage.removeItem('authUser');
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     // Listen for auth state changes (client-only)

@@ -455,12 +455,12 @@ export default function SocialHabitTracker() {
             {getCurrentMonthYear()}
           </div>
           <div className="text-sm font-medium text-[#13343b] dark:text-[#f5f5f5]">
-            {getCompletionStats().completed}/{getCompletionStats().total}
+            {isClient ? `${getCompletionStats().completed}/${getCompletionStats().total}` : '0/0'}
           </div>
         </div>
 
         {/* Empty State - Show when user has no habits */}
-        {showEmptyState && (
+        {showEmptyState && isClient && (
           <div className="py-16 text-center">
             <p className="text-lg text-[#626c71] dark:text-[rgba(167,169,169,0.8)] mb-4">
               Welcome, {authUser?.displayName || 'User'}! 👋
@@ -474,9 +474,17 @@ export default function SocialHabitTracker() {
           </div>
         )}
         
+        {/* Loading state */}
+        {!isClient && (
+          <div className="py-16 text-center">
+            <div className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">
+              Loading...
+            </div>
+          </div>
+        )}
 
         {/* Desktop Table */}
-        {!showEmptyState && (
+        {!showEmptyState && isClient && (
         <div className="overflow-x-auto hidden md:block">
           <table className="w-full border-collapse min-w-max">
             <thead>
@@ -499,7 +507,7 @@ export default function SocialHabitTracker() {
                 <tr key={habitIndex}>
                   <td 
                     className="text-left text-xs py-1 px-2 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[180px] max-w-[150px]"
-                    onMouseEnter={() => !isViewingOthers && authUser && setHoveredHabitIndex(habitIndex)}
+                    onMouseEnter={() => isClient && !isViewingOthers && authUser && setHoveredHabitIndex(habitIndex)}
                     onMouseLeave={() => setHoveredHabitIndex(null)}
                   >
                     {editingHabitIndex === habitIndex ? (
@@ -515,12 +523,12 @@ export default function SocialHabitTracker() {
                     ) : (
                       <div className="flex items-center justify-between gap-1 group">
                         <div
-                          onClick={() => handleHabitNameClick(habitIndex, habit)}
-                          className={`flex-1 cursor-text ${!authUser || isViewingOthers ? 'cursor-default' : 'hover:bg-gray-100 dark:hover:bg-gray-700'} rounded px-1 py-0.5 transition-colors`}
+                          onClick={() => isClient && handleHabitNameClick(habitIndex, habit)}
+                          className={`flex-1 ${isClient && !authUser || isViewingOthers ? 'cursor-default' : isClient ? 'cursor-text hover:bg-gray-100 dark:hover:bg-gray-700' : ''} rounded px-1 py-0.5 transition-colors`}
                         >
                           {habit}
                         </div>
-                        {authUser && !isViewingOthers && hoveredHabitIndex === habitIndex && (
+                        {isClient && authUser && !isViewingOthers && hoveredHabitIndex === habitIndex && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -605,7 +613,7 @@ export default function SocialHabitTracker() {
         )}
 
         {/* Mobile Table - Vertical Layout */}
-        {!showEmptyState && (
+        {!showEmptyState && isClient && (
         <div className="overflow-x-auto md:hidden">
           <table className="w-full border-collapse">
             <thead>
@@ -617,9 +625,9 @@ export default function SocialHabitTracker() {
                   <th 
                     key={index} 
                     className="border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] min-w-[28px] w-7 sticky top-0 z-10 bg-[#fffffe] dark:bg-[#262828] py-2"
-                    onMouseEnter={() => !isViewingOthers && authUser && setHoveredHabitIndex(index)}
+                    onMouseEnter={() => isClient && !isViewingOthers && authUser && setHoveredHabitIndex(index)}
                     onMouseLeave={() => setHoveredHabitIndex(null)}
-                    onClick={() => !isViewingOthers && authUser && setHoveredHabitIndex(hoveredHabitIndex === index ? null : index)}
+                    onClick={() => isClient && !isViewingOthers && authUser && setHoveredHabitIndex(hoveredHabitIndex === index ? null : index)}
                   >
                     <div className="flex flex-col items-center justify-center h-full gap-1">
                       {editingHabitIndex === index ? (
@@ -638,14 +646,14 @@ export default function SocialHabitTracker() {
                           <span 
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleHabitNameClick(index, habit);
+                              isClient && handleHabitNameClick(index, habit);
                             }}
-                            className={`text-[10px] text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium whitespace-nowrap ${!authUser || isViewingOthers ? 'cursor-default' : 'cursor-text hover:bg-gray-100 dark:hover:bg-gray-700'} rounded px-0.5 transition-colors`}
+                            className={`text-[10px] text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium whitespace-nowrap ${isClient && !authUser || isViewingOthers ? 'cursor-default' : isClient ? 'cursor-text hover:bg-gray-100 dark:hover:bg-gray-700' : ''} rounded px-0.5 transition-colors`}
                             style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}
                           >
                             {habit}
                           </span>
-                          {authUser && !isViewingOthers && hoveredHabitIndex === index && (
+                          {isClient && authUser && !isViewingOthers && hoveredHabitIndex === index && (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -742,7 +750,7 @@ export default function SocialHabitTracker() {
               onClick={() => setShowDropdown(!showDropdown)}
               className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors"
             >
-              {currentUser}
+              {isClient ? currentUser : '@user'}
             </div>
             
             {showDropdown && (
@@ -853,7 +861,7 @@ export default function SocialHabitTracker() {
           onClick={() => setShowDropdown(!showDropdown)}
           className="hidden md:block fixed bottom-6 left-6 text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors"
         >
-          {currentUser}
+          {isClient ? currentUser : '@user'}
         </div>
         
         {showDropdown && (
