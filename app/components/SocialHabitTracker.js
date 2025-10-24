@@ -167,9 +167,48 @@ export default function SocialHabitTracker() {
   // Dropdown menu state
   const [showDropdown, setShowDropdown] = useState(false);
   
+  // Theme state
+  const [theme, setTheme] = useState('system');
+  
   // State for current motivational reminder - start with first one to avoid hydration mismatch
   const [currentReminder, setCurrentReminder] = useState(motivationalReminders[0]);
   const [isClient, setIsClient] = useState(false);
+  
+  // Initialize theme from localStorage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'system';
+    setTheme(savedTheme);
+    applyTheme(savedTheme);
+  }, []);
+  
+  // Apply theme to document
+  const applyTheme = (newTheme) => {
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else if (newTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      // System preference
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  };
+  
+  // Handle theme change
+  const changeTheme = (newTheme) => {
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    applyTheme(newTheme);
+  };
+  
+  // Toggle between light and dark theme
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    changeTheme(newTheme);
+  };
   
   // Set random reminder on client mount
   useEffect(() => {
@@ -570,14 +609,14 @@ export default function SocialHabitTracker() {
                         window.location.href = `/#${currentUser.replace('@', '')}`;
                         setShowDropdown(false);
                       }}
-                      className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                     >
                       Profile
                     </div>
                     <Link href="/settings">
                       <div 
                         onClick={() => setShowDropdown(false)}
-                        className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                        className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                       >
                         Settings
                       </div>
@@ -585,7 +624,7 @@ export default function SocialHabitTracker() {
                     <Link href="/about">
                       <div 
                         onClick={() => setShowDropdown(false)}
-                        className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                        className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                       >
                         About
                       </div>
@@ -593,10 +632,20 @@ export default function SocialHabitTracker() {
                     <div className="border-t border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] my-1"></div>
                     <div 
                       onClick={() => {
+                        toggleTheme();
+                        setShowDropdown(false);
+                      }}
+                      className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    >
+                      {theme === 'dark' ? 'Light Theme' : 'Dark Theme'}
+                    </div>
+                    <div className="border-t border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] my-1"></div>
+                    <div 
+                      onClick={() => {
                         signOut();
                         setShowDropdown(false);
                       }}
-                      className="px-3 py-1.5 text-[10px] text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                     >
                       Sign out
                     </div>
@@ -606,7 +655,7 @@ export default function SocialHabitTracker() {
                     <Link href="/about">
                       <div 
                         onClick={() => setShowDropdown(false)}
-                        className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                        className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                       >
                         About
                       </div>
@@ -614,11 +663,21 @@ export default function SocialHabitTracker() {
                     <div className="border-t border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] my-1"></div>
                     <div 
                       onClick={() => {
+                        toggleTheme();
+                        setShowDropdown(false);
+                      }}
+                      className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    >
+                      {theme === 'dark' ? 'Light Theme' : 'Dark Theme'}
+                    </div>
+                    <div className="border-t border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] my-1"></div>
+                    <div 
+                      onClick={() => {
                         setLoginMessage("Sign in to track your own habits and save your progress");
                         setShowLoginModal(true);
                         setShowDropdown(false);
                       }}
-                      className="px-3 py-1.5 text-[10px] text-green-700 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 text-xs text-green-700 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                     >
                       Sign in
                     </div>
@@ -647,7 +706,7 @@ export default function SocialHabitTracker() {
       <div className="relative user-dropdown">
         <div 
           onClick={() => setShowDropdown(!showDropdown)}
-          className="hidden md:block fixed bottom-6 left-6 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors"
+          className="hidden md:block fixed bottom-6 left-6 text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors"
         >
           {currentUser}
         </div>
@@ -661,14 +720,14 @@ export default function SocialHabitTracker() {
                     window.location.href = `/#${currentUser.replace('@', '')}`;
                     setShowDropdown(false);
                   }}
-                  className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                 >
                   Profile
                 </div>
                 <Link href="/settings">
                   <div 
                     onClick={() => setShowDropdown(false)}
-                    className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                   >
                     Settings
                   </div>
@@ -676,7 +735,7 @@ export default function SocialHabitTracker() {
                 <Link href="/about">
                   <div 
                     onClick={() => setShowDropdown(false)}
-                    className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                   >
                     About
                   </div>
@@ -684,10 +743,20 @@ export default function SocialHabitTracker() {
                 <div className="border-t border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] my-1"></div>
                 <div 
                   onClick={() => {
+                    toggleTheme();
+                    setShowDropdown(false);
+                  }}
+                  className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                >
+                  {theme === 'dark' ? 'Light Theme' : 'Dark Theme'}
+                </div>
+                <div className="border-t border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] my-1"></div>
+                <div 
+                  onClick={() => {
                     signOut();
                     setShowDropdown(false);
                   }}
-                  className="px-3 py-1.5 text-[10px] text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                 >
                   Sign out
                 </div>
@@ -697,7 +766,7 @@ export default function SocialHabitTracker() {
                 <Link href="/about">
                   <div 
                     onClick={() => setShowDropdown(false)}
-                    className="px-3 py-2 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                   >
                     About
                   </div>
@@ -705,11 +774,21 @@ export default function SocialHabitTracker() {
                 <div className="border-t border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] my-1"></div>
                 <div 
                   onClick={() => {
+                    toggleTheme();
+                    setShowDropdown(false);
+                  }}
+                  className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                >
+                  {theme === 'dark' ? 'Light Theme' : 'Dark Theme'}
+                </div>
+                <div className="border-t border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] my-1"></div>
+                <div 
+                  onClick={() => {
                     setLoginMessage("Sign in to track your own habits and save your progress");
                     setShowLoginModal(true);
                     setShowDropdown(false);
                   }}
-                  className="px-3 py-1.5 text-[10px] text-green-700 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 text-xs text-green-700 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                 >
                   Sign in
                 </div>
