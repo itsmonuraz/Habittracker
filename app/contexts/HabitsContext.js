@@ -2,85 +2,164 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { getFirestoreDb, isFirebaseAvailable } from '../lib/firebase';
 
 const HabitsContext = createContext({});
 
 export const useHabits = () => useContext(HabitsContext);
 
 export function HabitsProvider({ children }) {
-  const { user: authUser } = useAuth();
+  const { user: authUser, loading: authLoading } = useAuth();
   
   // State for habits by month - format: { "2025-01": ["Habit 1", "Habit 2"], "2025-02": [...], ... }
   const [habitsByMonth, setHabitsByMonth] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('habitsByMonth');
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch (e) {
-          console.error('Failed to parse saved habits:', e);
-        }
-      }
-    }
-    // Initialize with 5 default habits for each month of 2025
+    // Initialize with 1 default habit for each month of 2025
     const defaultHabits = {};
     for (let month = 1; month <= 12; month++) {
       const monthKey = `2025-${month.toString().padStart(2, '0')}`;
-      defaultHabits[monthKey] = Array.from({ length: 5 }, (_, i) => `Habit ${i + 1}`);
+      defaultHabits[monthKey] = ['Habit 1'];
     }
     return defaultHabits;
   });
   
   // State for completions - format: { "2025-10-22": ["Habit 1", "Habit 2"], ... }
-  const [completions, setCompletions] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('userCompletions');
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch (e) {
-          console.error('Failed to parse saved completions:', e);
-        }
-      }
-    }
-    return {};
-  });
+  const [completions, setCompletions] = useState({});
 
   // State for productive hours - format: { "2025-10-22": "8", "2025-10-23": "6.5", ... }
-  const [productiveHours, setProductiveHours] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('productiveHours');
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch (e) {
-          console.error('Failed to parse saved productive hours:', e);
+  const [productiveHours, setProductiveHours] = useState({});
+
+  // State to track if data has been loaded from Firestore
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Load habits data from Firestore when user logs in
+  useEffect(() => {
+    if (authLoading) return;
+
+    const loadHabitsData = async () => {
+      if (!authUser || !isFirebaseAvailable()) {
+        // Reset to default if logged out
+        const defaultHabits = {};
+        for (let month = 1; month <= 12; month++) {
+          const monthKey = `2025-${month.toString().padStart(2, '0')}`;
+          defaultHabits[monthKey] = ['Habit 1'];
+        }
+        setHabitsByMonth(defaultHabits);
+        setCompletions({});
+        setProductiveHours({});
+        setDataLoaded(true);
+        return;
+      }
+
+      try {
+        const db = getFirestoreDb();
+        const userHabitsRef = doc(db, 'userHabits', authUser.uid);
+        const docSnap = await getDoc(userHabitsRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setHabitsByMonth(data.habitsByMonth || {});
+          setCompletions(data.completions || {});
+          setProductiveHours(data.productiveHours || {});
+        } else {
+          // Check if there's data in localStorage to migrate
+          let localHabits = {};
+          let localCompletions = {};
+          let localHours = {};
+
+          if (typeof window !== 'undefined') {
+            try {
+              const savedHabits = localStorage.getItem('habitsByMonth');
+              const savedCompletions = localStorage.getItem('userCompletions');
+              const savedHours = localStorage.getItem('productiveHours');
+              
+              if (savedHabits) localHabits = JSON.parse(savedHabits);
+              if (savedCompletions) localCompletions = JSON.parse(savedCompletions);
+              if (savedHours) localHours = JSON.parse(savedHours);
+            } catch (e) {
+              console.error('Error parsing localStorage data:', e);
+            }
+          }
+
+          // Initialize with localStorage data if available, otherwise 1 habit per month for new users
+          let defaultHabitsForNewUser = {};
+          if (Object.keys(localHabits).length === 0) {
+            // New user - initialize with 1 habit per month
+            for (let month = 1; month <= 12; month++) {
+              const monthKey = `2025-${month.toString().padStart(2, '0')}`;
+              defaultHabitsForNewUser[monthKey] = ['Habit 1'];
+            }
+          }
+          
+          const initialData = {
+            habitsByMonth: Object.keys(localHabits).length > 0 ? localHabits : defaultHabitsForNewUser,
+            completions: localCompletions,
+            productiveHours: localHours,
+            updatedAt: new Date()
+          };
+          
+          await setDoc(userHabitsRef, initialData);
+          setHabitsByMonth(initialData.habitsByMonth);
+          setCompletions(initialData.completions);
+          setProductiveHours(initialData.productiveHours);
+
+          // Clear localStorage after successful migration
+          if (typeof window !== 'undefined' && Object.keys(localHabits).length > 0) {
+            console.log('✅ Successfully migrated data from localStorage to Firestore');
+            localStorage.removeItem('habitsByMonth');
+            localStorage.removeItem('userCompletions');
+            localStorage.removeItem('productiveHours');
+          }
+        }
+        setDataLoaded(true);
+      } catch (error) {
+        console.error('Error loading habits data from Firestore:', error);
+        setDataLoaded(true);
+      }
+    };
+
+    loadHabitsData();
+  }, [authUser, authLoading]);
+
+  // Save habits data to Firestore whenever it changes (debounced)
+  useEffect(() => {
+    if (!authUser || !isFirebaseAvailable() || !dataLoaded) return;
+
+    const saveToFirestore = async () => {
+      try {
+        const db = getFirestoreDb();
+        const userHabitsRef = doc(db, 'userHabits', authUser.uid);
+        
+        await updateDoc(userHabitsRef, {
+          habitsByMonth,
+          completions,
+          productiveHours,
+          updatedAt: new Date()
+        });
+      } catch (error) {
+        console.error('Error saving habits data to Firestore:', error);
+        // If document doesn't exist, create it
+        if (error.code === 'not-found') {
+          try {
+            const db = getFirestoreDb();
+            const userHabitsRef = doc(db, 'userHabits', authUser.uid);
+            await setDoc(userHabitsRef, {
+              habitsByMonth,
+              completions,
+              productiveHours,
+              updatedAt: new Date()
+            });
+          } catch (createError) {
+            console.error('Error creating habits document:', createError);
+          }
         }
       }
-    }
-    return {};
-  });
+    };
 
-  // Save to localStorage whenever habits change
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('habitsByMonth', JSON.stringify(habitsByMonth));
-    }
-  }, [habitsByMonth]);
-
-  // Save to localStorage whenever completions change
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('userCompletions', JSON.stringify(completions));
-    }
-  }, [completions]);
-
-  // Save to localStorage whenever productive hours change
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('productiveHours', JSON.stringify(productiveHours));
-    }
-  }, [productiveHours]);
+    // Debounce the save operation to avoid too many writes
+    const timeoutId = setTimeout(saveToFirestore, 500);
+    return () => clearTimeout(timeoutId);
+  }, [habitsByMonth, completions, productiveHours, authUser, dataLoaded]);
 
   // Get habits for a specific month
   const getHabitsForMonth = (monthKey) => {

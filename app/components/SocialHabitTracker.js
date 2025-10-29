@@ -144,6 +144,9 @@ export default function SocialHabitTracker() {
         }
         return prevData;
       });
+    } else {
+      // When user signs out, reset to demo user
+      setViewingUser("@camino");
     }
   }, [authUser]);
   
@@ -159,10 +162,35 @@ export default function SocialHabitTracker() {
     });
     console.log('👤 User:', authUser ? `Logged in as ${authUser.displayName} (${authUser.username})` : 'Not logged in (viewing demo)');
   }, [authUser]);
+
+  // Check if user is new and show welcome modal
+  useEffect(() => {
+    if (authUser && typeof window !== 'undefined') {
+      const hasSeenWelcome = localStorage.getItem(`welcomeSeen_${authUser.uid}`);
+      if (!hasSeenWelcome) {
+        // Small delay to let the page load first
+        const timer = setTimeout(() => {
+          setShowWelcomeModal(true);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [authUser]);
+
+  // Handle welcome modal close
+  const handleWelcomeClose = () => {
+    if (authUser && typeof window !== 'undefined') {
+      localStorage.setItem(`welcomeSeen_${authUser.uid}`, 'true');
+    }
+    setShowWelcomeModal(false);
+  };
   
   // Login modal state
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loginMessage, setLoginMessage] = useState('');
+  
+  // Welcome modal state for new users
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   
   // Dropdown menu state
   const [showDropdown, setShowDropdown] = useState(false);
@@ -474,21 +502,6 @@ export default function SocialHabitTracker() {
             {isClient ? `${getCompletionStats().completed}/${getCompletionStats().total}` : '0/0'}
           </div>
         </div>
-
-        {/* Empty State - Show when user has no habits */}
-        {showEmptyState && isClient && (
-          <div className="py-16 text-center">
-            <p className="text-lg text-[#626c71] dark:text-[rgba(167,169,169,0.8)] mb-4">
-              Welcome, {authUser?.displayName || 'User'}!
-            </p>
-            <p className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-6">
-              You don&apos;t have any habits yet. Start building your routine!
-            </p>
-            <p className="text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.6)] italic">
-              Coming soon: Add and manage your own habits
-            </p>
-          </div>
-        )}
         
         {/* Loading state */}
         {!isClient && (
@@ -946,6 +959,36 @@ export default function SocialHabitTracker() {
         onClose={() => setShowLoginModal(false)}
         message={loginMessage}
       />
+
+      {/* Welcome Modal for New Users */}
+      {showWelcomeModal && (
+        <div className="fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-xl max-w-md w-full p-6 animate-in fade-in duration-200">
+            <div className="text-center space-y-4">
+              <h3 className="text-lg font-medium text-[#13343b] dark:text-[#f5f5f5]">
+                Welcome to your habits journey 🌱
+              </h3>
+              <div className="space-y-4 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.8)] leading-relaxed">
+                <p>
+                  Click on any habit name to make it yours and rename it to the next habit you want to build.
+                </p>
+                <p>
+                  Ready to add more? Head to <Link href={`/#${authUser?.username?.replace('@', '')}`} className="text-green-700 dark:text-green-600 underline hover:text-green-800 dark:hover:text-green-700">Full Year Preview</Link> to build your path, one habit at a time.
+                </p>
+                <p>
+                  Curious about Camino? Visit the <Link href="/about" className="text-green-700 dark:text-green-600 underline hover:text-green-800 dark:hover:text-green-700">About page</Link> to learn more about this space we&apos;re building together.
+                </p>
+              </div>
+              <button
+                onClick={handleWelcomeClose}
+                className="mt-4 px-6 py-2 bg-green-700 dark:bg-green-800 text-white text-sm rounded-lg hover:bg-green-800 dark:hover:bg-green-900 transition-colors"
+              >
+                Let&apos;s begin
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Context Menu for Deleting Habits */}
       {contextMenu && (
