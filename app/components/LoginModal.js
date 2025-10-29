@@ -181,7 +181,7 @@ export default function LoginModal({ isOpen, onClose, message }) {
 
   const renderUsernameScreen = () => (
     <>
-      <button onClick={() => setScreen('initial')} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '18px', cursor: 'pointer', marginBottom: '16px', transition: 'color 0.2s' }}
+      <button onClick={() => setScreen('initial')} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '10px', cursor: 'pointer', marginBottom: '16px', transition: 'color 0.2s' }}
       onMouseOver={(e) => e.target.style.color = '#111827'}
       onMouseOut={(e) => e.target.style.color = '#6b7280'}
       >
@@ -238,7 +238,7 @@ export default function LoginModal({ isOpen, onClose, message }) {
 
   const renderSignupScreen = () => (
     <>
-      <button onClick={() => setScreen('username')} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '18px', cursor: 'pointer', marginBottom: '16px', transition: 'color 0.2s' }}
+      <button onClick={() => setScreen('username')} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '10px', cursor: 'pointer', marginBottom: '16px', transition: 'color 0.2s' }}
       onMouseOver={(e) => e.target.style.color = '#111827'}
       onMouseOut={(e) => e.target.style.color = '#6b7280'}
       >

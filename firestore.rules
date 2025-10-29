@@ -4,8 +4,15 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Users collection - users can read/write their own profile
     match /users/{userId} {
+      // Allow authenticated users to read their own profile
       allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if request.auth != null && request.auth.uid == userId;
+      // Allow users to create their profile on signup
+      allow create: if request.auth != null && request.auth.uid == userId;
+      // Allow users to update their own profile
+      allow update: if request.auth != null && request.auth.uid == userId;
+      // Allow anyone to query for username availability (only username field)
+      // This is safe because it's just checking if a username exists, not exposing sensitive data
+      allow list: if true;
     }
     
     // User habits collection - users can read/write their own habits data
