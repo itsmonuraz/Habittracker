@@ -458,7 +458,7 @@ export default function SocialHabitTracker() {
               setLoginMessage("Sign in to track your own habits and save your progress");
               setShowLoginModal(true);
             }}
-            className="text-sm text-green-700 dark:text-green-400 underline hover:text-green-900 dark:hover:text-green-300 transition-colors cursor-pointer bg-transparent border-none font-semibold"
+            className="text-sm text-green-900 dark:text-green-800 underline hover:text-green-900 dark:hover:text-green-700 transition-colors cursor-pointer bg-transparent border-none font-semibold"
           >
             Sign in to start tracking your habits
           </button>
@@ -479,7 +479,7 @@ export default function SocialHabitTracker() {
         {showEmptyState && isClient && (
           <div className="py-16 text-center">
             <p className="text-lg text-[#626c71] dark:text-[rgba(167,169,169,0.8)] mb-4">
-              Welcome, {authUser?.displayName || 'User'}! 👋
+              Welcome, {authUser?.displayName || 'User'}!
             </p>
             <p className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-6">
               You don&apos;t have any habits yet. Start building your routine!
@@ -563,7 +563,7 @@ export default function SocialHabitTracker() {
                       >
                           <div className={`w-full h-full rounded transition-all duration-200 relative
                             ${isCompleted ? 'bg-green-700 dark:bg-green-800' : isFuture ? 'bg-black/10' : 'bg-transparent'}
-                            ${!isDisabled && !isCompleted ? 'hover:scale-95 hover:shadow-inner hover:bg-gray-100 dark:hover:bg-gray-700' : ''}
+                            ${!isDisabled && !isCompleted ? 'hover:scale-95 hover:shadow-inner hover:bg-gray-100 dark:hover:bg-gray-700/40' : ''}
                             ${isPast && !isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/10 after:pointer-events-none after:rounded' : ''}
                             ${isPast && isCompleted ? 'after:content-[""] after:absolute after:inset-0 after:bg-black/20 after:pointer-events-none after:rounded' : ''}
                           `} />
@@ -743,14 +743,14 @@ export default function SocialHabitTracker() {
                         window.location.href = `/#${currentUser.replace('@', '')}`;
                         setShowDropdown(false);
                       }}
-                      className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700/40 transition-colors cursor-pointer"
                     >
-                      Profile
+                      Full Year Preview
                     </div>
                     <Link href="/settings">
                       <div 
                         onClick={() => setShowDropdown(false)}
-                        className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                        className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700/40 transition-colors cursor-pointer"
                       >
                         Settings
                       </div>
@@ -779,7 +779,7 @@ export default function SocialHabitTracker() {
                         signOut();
                         setShowDropdown(false);
                       }}
-                      className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700/40 transition-colors cursor-pointer"
                     >
                       Sign out
                     </div>
@@ -811,7 +811,7 @@ export default function SocialHabitTracker() {
                         setShowLoginModal(true);
                         setShowDropdown(false);
                       }}
-                      className="px-3 py-1.5 text-xs text-green-700 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 text-xs text-green-900 dark:text-green-900 hover:bg-gray-100 dark:hover:bg-gray-700/40 transition-colors cursor-pointer"
                     >
                       Sign in
                     </div>
@@ -854,14 +854,14 @@ export default function SocialHabitTracker() {
                     window.location.href = `/#${currentUser.replace('@', '')}`;
                     setShowDropdown(false);
                   }}
-                  className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700/40transition-colors cursor-pointer"
                 >
-                  Profile
+                  Full Year Preview
                 </div>
                 <Link href="/settings">
                   <div 
                     onClick={() => setShowDropdown(false)}
-                    className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700/40  transition-colors cursor-pointer"
                   >
                     Settings
                   </div>
@@ -869,7 +869,7 @@ export default function SocialHabitTracker() {
                 <Link href="/about">
                   <div 
                     onClick={() => setShowDropdown(false)}
-                    className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700/40 transition-colors cursor-pointer"
                   >
                     About
                   </div>
@@ -880,7 +880,7 @@ export default function SocialHabitTracker() {
                     toggleTheme();
                     setShowDropdown(false);
                   }}
-                  className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700/40 transition-colors cursor-pointer"
                 >
                   {theme === 'dark' ? 'Light Theme' : 'Dark Theme'}
                 </div>
@@ -890,7 +890,7 @@ export default function SocialHabitTracker() {
                     signOut();
                     setShowDropdown(false);
                   }}
-                  className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700/40 transition-colors cursor-pointer"
                 >
                   Sign out
                 </div>
@@ -900,7 +900,7 @@ export default function SocialHabitTracker() {
                 <Link href="/about">
                   <div 
                     onClick={() => setShowDropdown(false)}
-                    className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700/40 transition-colors cursor-pointer"
                   >
                     About
                   </div>
@@ -911,7 +911,7 @@ export default function SocialHabitTracker() {
                     toggleTheme();
                     setShowDropdown(false);
                   }}
-                  className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 text-xs text-[#13343b] dark:text-[#f5f5f5] hover:bg-gray-100 dark:hover:bg-gray-700/40 transition-colors cursor-pointer"
                 >
                   {theme === 'dark' ? 'Light Theme' : 'Dark Theme'}
                 </div>
@@ -922,7 +922,7 @@ export default function SocialHabitTracker() {
                     setShowLoginModal(true);
                     setShowDropdown(false);
                   }}
-                  className="px-3 py-1.5 text-xs text-green-700 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 text-xs text-green-700 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700/40 transition-colors cursor-pointer"
                 >
                   Sign in
                 </div>

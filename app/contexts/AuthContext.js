@@ -119,7 +119,10 @@ export function AuthProvider({ children }) {
   const checkUsernameAvailability = async (username) => {
     try {
       const firestoreDb = getFirestoreDb();
-      const usernameToCheck = username.startsWith('@') ? username : `@${username}`;
+      // Convert to lowercase before checking
+      const usernameToCheck = username.toLowerCase().startsWith('@') 
+        ? username.toLowerCase() 
+        : `@${username.toLowerCase()}`;
       const usersRef = collection(firestoreDb, 'users');
       const q = query(usersRef, where('username', '==', usernameToCheck));
       const querySnapshot = await getDocs(q);
@@ -133,7 +136,10 @@ export function AuthProvider({ children }) {
   // Create user profile in Firestore
   const createUserProfile = async (uid, email, displayName, username) => {
     const firestoreDb = getFirestoreDb();
-    const usernameWithAt = username.startsWith('@') ? username : `@${username}`;
+    // Convert username to lowercase and add @ if needed
+    const usernameWithAt = username.toLowerCase().startsWith('@') 
+      ? username.toLowerCase() 
+      : `@${username.toLowerCase()}`;
     const userDocRef = doc(firestoreDb, 'users', uid);
     await setDoc(userDocRef, {
       uid,
@@ -236,6 +242,35 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Update username
+  const updateUsername = async (newUsername) => {
+    try {
+      if (!user) {
+        throw new Error('No user logged in');
+      }
+
+      // Convert to lowercase and add @ if needed
+      const usernameWithAt = newUsername.toLowerCase().startsWith('@') 
+        ? newUsername.toLowerCase() 
+        : `@${newUsername.toLowerCase()}`;
+      const firestoreDb = getFirestoreDb();
+      const userDocRef = doc(firestoreDb, 'users', user.uid);
+      
+      await setDoc(userDocRef, {
+        username: usernameWithAt
+      }, { merge: true });
+
+      // Update local user state
+      const updatedUser = { ...user, username: usernameWithAt };
+      setUser(updatedUser);
+      
+      return updatedUser;
+    } catch (err) {
+      console.error('Error updating username:', err);
+      throw err;
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -243,6 +278,7 @@ export function AuthProvider({ children }) {
     signInWithEmail,
     signUpWithEmail,
     checkUsernameAvailability,
+    updateUsername,
     signOut
   };
 

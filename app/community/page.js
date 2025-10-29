@@ -93,6 +93,8 @@ const dateRange = generateDateRange();
 export default function CommunityPage() {
   // State to track which users have their tables expanded
   const [expandedUsers, setExpandedUsers] = useState({});
+  // State to track if all tables are expanded
+  const [allExpanded, setAllExpanded] = useState(false);
 
   // Toggle expanded state for a user
   const toggleUserExpansion = (userName) => {
@@ -100,6 +102,17 @@ export default function CommunityPage() {
       ...prev,
       [userName]: !prev[userName]
     }));
+  };
+
+  // Toggle all tables expanded/collapsed
+  const toggleAllTables = () => {
+    const newExpanded = !allExpanded;
+    setAllExpanded(newExpanded);
+    const newState = {};
+    Object.keys(userData).forEach(userName => {
+      newState[userName] = newExpanded;
+    });
+    setExpandedUsers(newState);
   };
 
   // Format date for display - just return the day number
@@ -164,13 +177,25 @@ export default function CommunityPage() {
       <div className="w-full max-w-6xl mb-6 md:mb-8">
         <div className="flex items-center justify-between gap-4 mb-4">
 
-          <h1 className="text-lg md:text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] hover:text-green-900 dark:hover:text-[#f5f5f5] transition-colors cursor-pointer flex-1">
-            <span className="hidden md:inline">Community Habits - {getCurrentMonthYear()}</span>
-            <span className="md:hidden">Community - {getCurrentMonthYear()}</span>
-          </h1>
-                    <Link href="/" className="text-xs text-green-700 dark:text-green-400 hover:underline font-medium mr-2">
+          <div className="flex-1">
+            <Link href="/" className="block">
+              <h1 className="text-lg md:text-2xl font-bold text-[#13343b] dark:text-[#f5f5f5] hover:text-green-900 dark:hover:text-[#f5f5f5] transition-colors cursor-pointer">
+                <span className="hidden md:inline">Community Habits - {getCurrentMonthYear()}</span>
+                <span className="md:hidden">Community - {getCurrentMonthYear()}</span>
+              </h1>
+            </Link>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleAllTables}
+              className="text-xs text-green-700 dark:text-green-400 hover:underline font-medium"
+            >
+              {allExpanded ? 'Collapse All' : 'Expand All'}
+            </button>
+            <Link href="/" className="text-xs text-green-700 dark:text-green-400 hover:underline font-medium">
               Back
-          </Link>
+            </Link>
+          </div>
         </div>
       </div>
 

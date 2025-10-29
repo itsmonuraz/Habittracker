@@ -122,7 +122,7 @@ export default function LoginModal({ isOpen, onClose, message }) {
           width: '100%', padding: '12px', backgroundColor: '#14532d', color: '#ffffff',
           border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500',
           cursor: isLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center',
-          justifyContent: 'center', gap: '10px', transition: 'all 0.2s', opacity: isLoading ? 0.7 : 1, marginBottom: '12px'
+          justifyContent: 'center', gap: '10px', transition: 'all 0.2s', opacity: 1, marginBottom: '12px'
         }}
         onMouseOver={(e) => !isLoading && (e.target.style.backgroundColor = '#15803d')}
         onMouseOut={(e) => !isLoading && (e.target.style.backgroundColor = '#14532d')}

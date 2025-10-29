@@ -43,15 +43,15 @@ export default function AboutPage() {
             <br/>
             <br/>
             You can view your yearly habits progress data in the
-           <Link href="/username" className="text-[#14532d] dark:text-[#9a9a9a] hover:underline">/username</Link> page.
+           <Link href="/username" className="text-[#14532d] dark:text-[#25844b] hover:underline"> /username</Link> page.
             <br/>
             <br/>
             To ensure a sync across devices, Camino uses your Google account for authentication.
-            You can <Link href="/" className="text-[#14532d] dark:text-[#9a9a9a] hover:underline">sign up</Link> using your Google account, create a username, and start tracking your habits seamlessly across multiple devices.
+            You can <Link href="/" className="text-[#14532d] dark:text-[#25844b] hover:underline">sign up</Link> using your Google account, create a username, and start tracking your habits seamlessly across multiple devices.
             <br/>
             <br/>
             If you have any questions, suggestions, or feedback, feel free to reach out to me at {' '}
-           <a href="mailto:caminotracker@gmail.com" className="text-[#14532d] dark:text-[#9a9a9a] hover:underline">caminotracker@gmail.com</a>.
+           <a href="mailto:caminotracker@gmail.com" className="text-[#14532d] dark:text-[#25844b] hover:underline">caminotracker@gmail.com</a>.
 
             </p>
 
@@ -62,7 +62,7 @@ export default function AboutPage() {
                   href="https://github.com/rknastenka" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-[#14532d] dark:text-[#9a9a9a] hover:underline font-medium"
+                  className="text-[#14532d] dark:text-[#25844b] hover:underline font-medium"
                 >
                   @rknastenka
                 </a>
