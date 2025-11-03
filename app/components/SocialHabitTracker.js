@@ -73,16 +73,6 @@ const userData = {
   }
 };
 
-// Generate 30 days of dates (October 1-30, 2025)
-const generateDateRange = () => {
-  const dates = [];
-  for (let i = 1; i <= 30; i++) {
-    const day = i.toString().padStart(2, '0');
-    dates.push(`2025-10-${day}`);
-  }
-  return dates;
-};
-
 // Get current date dynamically
 const getCurrentDate = () => {
   const now = new Date();
@@ -93,6 +83,26 @@ const getCurrentDate = () => {
 };
 
 const currentDate = getCurrentDate();
+
+// Generate date range for current month dynamically
+const generateDateRange = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth(); // 0-indexed (0 = January, 10 = November)
+  
+  // Get the number of days in the current month
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  
+  const dates = [];
+  const monthStr = (month + 1).toString().padStart(2, '0');
+  
+  for (let i = 1; i <= daysInMonth; i++) {
+    const day = i.toString().padStart(2, '0');
+    dates.push(`${year}-${monthStr}-${day}`);
+  }
+  return dates;
+};
+
 const dateRange = generateDateRange();
 
 // Motivational reminders array
@@ -304,7 +314,7 @@ export default function SocialHabitTracker() {
     }
     
     if (viewingUser !== currentUser) return; // Read-only mode
-    if (isFutureDate(date)) return; // Can't toggle future dates
+    if (!isToday(date)) return; // Can only toggle today's date
 
     // Use shared context for logged-in users
     toggleCompletion(date, habit);
@@ -335,7 +345,7 @@ export default function SocialHabitTracker() {
     }
     
     if (viewingUser !== currentUser) return; // Read-only mode
-    if (isFutureDate(date)) return; // Can't set future dates
+    if (!isToday(date)) return; // Can only set today's date
     
     // Allow empty input
     if (value === '') {
@@ -562,7 +572,7 @@ export default function SocialHabitTracker() {
                     const isFuture = isFutureDate(date);
                     const isPast = isPastDate(date);
                     const isTodayDate = isToday(date);
-                    const isDisabled = isViewingOthers || isFuture || isPast;
+                    const isDisabled = isViewingOthers || !isTodayDate;
                     const cellId = `cell-${viewingUser}-${habitIndex}-${dateIndex}`;
                     
                     return (
@@ -594,7 +604,8 @@ export default function SocialHabitTracker() {
                 {dateRange.map((date, dateIndex) => {
                   const isFuture = isFutureDate(date);
                   const isPast = isPastDate(date);
-                  const isDisabled = isViewingOthers || isFuture || isPast;
+                  const isTodayDate = isToday(date);
+                  const isDisabled = isViewingOthers || !isTodayDate;
                   const hours = getProductiveHours(date);
                   
                   return (
@@ -689,7 +700,7 @@ export default function SocialHabitTracker() {
                       const isFuture = isFutureDate(date);
                       const isPast = isPastDate(date);
                       const isTodayDate = isToday(date);
-                      const isDisabled = isViewingOthers || isFuture || isPast;
+                      const isDisabled = isViewingOthers || !isTodayDate;
                       const cellId = `cell-mobile-${viewingUser}-${dateIndex}-${habitIndex}`;
                       
                       return (
@@ -720,10 +731,10 @@ export default function SocialHabitTracker() {
                         inputMode="decimal"
                         value={getProductiveHours(date)}
                         onChange={(e) => handleProductiveHoursChange(date, e.target.value)}
-                        disabled={isViewingOthers || isFutureDate(date) || isPastDate(date)}
+                        disabled={isViewingOthers || !isToday(date)}
                         placeholder={isFutureDate(date) ? '' : '0'}
                         className={`w-full h-full text-[10px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded
-                          ${!(isViewingOthers || isFutureDate(date) || isPastDate(date)) ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : 'cursor-not-allowed'}
+                          ${!(isViewingOthers || !isToday(date)) ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : 'cursor-not-allowed'}
                           ${isFutureDate(date) ? 'bg-black/10' : ''}
                           focus:bg-green-50 dark:focus:bg-green-900/20 focus:ring-1 focus:ring-green-600
                         `}
