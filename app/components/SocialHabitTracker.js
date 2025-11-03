@@ -502,8 +502,8 @@ export default function SocialHabitTracker() {
           </button>
         </div>
       )}
-      
-      <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-4 w-full max-w-[1100px] overflow-x-auto">
+
+      <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-md p-4 w-full max-w-[1250px] overflow-x-auto">
         <div className="flex justify-between items-center pl-2 pr-2 mb-4">
           <div className="text-sm font-medium text-[#13343b] dark:text-[#f5f5f5]">
             {getCurrentMonthYear()}
@@ -519,13 +519,13 @@ export default function SocialHabitTracker() {
           <table className="w-full border-collapse min-w-max">
             <thead>
               <tr>
-                <th className="text-left font-semibold text-xs py-1 px-2 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] sticky left-0 z-30 min-w-[120px] bg-[#fffffe] dark:bg-[#262828]">
+                <th className="text-left font-semibold text-sm py-1 px-2 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] sticky left-0 z-30 min-w-[180px] bg-[#fffffe] dark:bg-[#262828]">
                   
                 </th>
                 {dateRange.map((date, index) => {
                   const dayNumber = formatDateHeader(date);
                   return (
-                    <th key={index} className="text-center text-[10px] text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium py-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] w-7 min-w-[28px] sticky top-0 z-10 bg-[#fffffe] dark:bg-[#262828]">
+                    <th key={index} className="text-center text-[11px] text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium py-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] w-8 min-w-[32px] sticky top-0 z-10 bg-[#fffffe] dark:bg-[#262828]">
                       {dayNumber}
                     </th>
                   );
@@ -536,7 +536,7 @@ export default function SocialHabitTracker() {
               {user.habits.map((habit, habitIndex) => (
                 <tr key={habitIndex}>
                   <td 
-                    className="text-left text-xs py-1 px-2 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[180px] max-w-[150px]"
+                    className="text-left text-sm py-1 px-2 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[200px] max-w-[200px]"
                   >
                     {editingHabitIndex === habitIndex ? (
                       <input
@@ -546,7 +546,7 @@ export default function SocialHabitTracker() {
                         onBlur={() => handleHabitNameBlur(habitIndex)}
                         onKeyDown={(e) => handleHabitNameKeyPress(e, habitIndex)}
                         autoFocus
-                        className="w-full bg-transparent border-none outline-none focus:ring-1 focus:ring-green-600 rounded px-1 text-[#13343b] dark:text-[#f5f5f5]"
+                        className="w-full bg-transparent border-none outline-none focus:ring-1 focus:ring-green-600 rounded px-1 text-sm text-[#13343b] dark:text-[#f5f5f5]"
                       />
                     ) : (
                       <div
@@ -570,7 +570,7 @@ export default function SocialHabitTracker() {
                       <td 
                         key={dateIndex}
                         id={cellId}
-                        className={`text-center p-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] w-7 min-w-[28px] h-[28px] transition-all duration-200 relative
+                        className={`text-center p-1 border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] w-8 min-w-[32px] h-[32px] transition-all duration-200 relative
                           ${!isDisabled ? 'cursor-pointer' : 'cursor-not-allowed'}
                         `}
                         onClick={() => !isDisabled && toggleHabitCompletion(habit, date)}
@@ -589,7 +589,7 @@ export default function SocialHabitTracker() {
               
               {/* Productive Hours Row */}
               <tr>
-                <td className="text-left text-xs py-1 px-2 text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[180px] max-w-[150px] font-semibold">
+                <td className="text-left text-sm py-1 px-2 text-[#13343b] dark:text-[#f5f5f5] sticky left-0 bg-[#fffffe] dark:bg-[#262828] z-20 min-w-[200px] max-w-[200px] font-semibold">
                   {/* Empty cell for row label */}
                 </td>
                 {dateRange.map((date, dateIndex) => {
@@ -602,7 +602,7 @@ export default function SocialHabitTracker() {
                   return (
                     <td 
                       key={dateIndex}
-                      className="text-center p-0.5 border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] w-7 min-w-[28px] h-[28px]"
+                      className="text-center p-0.5 border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] w-8 min-w-[32px] h-[32px]"
                     >
                       <input
                         type="text"
@@ -611,7 +611,7 @@ export default function SocialHabitTracker() {
                         onChange={(e) => handleProductiveHoursChange(date, e.target.value)}
                         disabled={isDisabled}
                         placeholder={isFuture ? '' : '0'}
-                        className={`w-full h-full text-[10px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded
+                        className={`w-full h-full text-[11px] text-center border-none bg-transparent outline-none text-[#13343b] dark:text-[#f5f5f5] rounded
                           ${!isDisabled ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : 'cursor-not-allowed'}
                           ${isFuture ? 'bg-black/10' : ''}
                           focus:bg-green-50 dark:focus:bg-green-900/20 focus:ring-1 focus:ring-green-600
@@ -855,7 +855,7 @@ export default function SocialHabitTracker() {
       <div className="relative user-dropdown">
         <div 
           onClick={() => setShowDropdown(!showDropdown)}
-          className="hidden md:block fixed bottom-6 left-6 text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors"
+          className="hidden md:block fixed bottom-6 left-6 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors"
         >
           {isClient ? currentUser : '@user'}
         </div>
@@ -949,7 +949,7 @@ export default function SocialHabitTracker() {
 
       <Link href="/community">
         <div 
-          className="hidden md:block fixed bottom-6 right-6 text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors"
+          className="hidden md:block fixed bottom-6 right-6 text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium cursor-pointer hover:text-[#13343b] dark:hover:text-[#f5f5f5] transition-colors"
         >
           Community
         </div>
