@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { getFirestoreDb, isFirebaseAvailable } from '../lib/firebase';
@@ -11,6 +11,9 @@ export const useHabits = () => useContext(HabitsContext);
 
 export function HabitsProvider({ children }) {
   const { user: authUser, loading: authLoading } = useAuth();
+  
+  // Ref to track if we've loaded from cache to prevent duplicate loads
+  const hasLoadedFromCache = useRef(false);
   
   // State for habits by month - format: { "2025-01": ["Habit 1", "Habit 2"], "2025-02": [...], ... }
   const [habitsByMonth, setHabitsByMonth] = useState(() => {
@@ -32,6 +35,39 @@ export function HabitsProvider({ children }) {
   // State to track if data has been loaded from Firestore
   const [dataLoaded, setDataLoaded] = useState(false);
 
+  // Immediately load from cache when authUser becomes available
+  useEffect(() => {
+    if (!authUser || hasLoadedFromCache.current) return;
+    
+    if (typeof window !== 'undefined') {
+      try {
+        const savedHabits = localStorage.getItem(`habitsByMonth_${authUser.uid}`);
+        const savedCompletions = localStorage.getItem(`userCompletions_${authUser.uid}`);
+        const savedHours = localStorage.getItem(`productiveHours_${authUser.uid}`);
+        
+        if (savedHabits) {
+          const habits = JSON.parse(savedHabits);
+          setHabitsByMonth(habits);
+          console.log('✅ Loaded habits from cache');
+        }
+        if (savedCompletions) {
+          const comps = JSON.parse(savedCompletions);
+          setCompletions(comps);
+          console.log('✅ Loaded completions from cache');
+        }
+        if (savedHours) {
+          const hours = JSON.parse(savedHours);
+          setProductiveHours(hours);
+          console.log('✅ Loaded productive hours from cache');
+        }
+        
+        hasLoadedFromCache.current = true;
+      } catch (e) {
+        console.error('Error loading from cache:', e);
+      }
+    }
+  }, [authUser]);
+
   // Load habits data from Firestore when user logs in
   useEffect(() => {
     if (authLoading) return;
@@ -51,6 +87,45 @@ export function HabitsProvider({ children }) {
         return;
       }
 
+      // Try to load from localStorage first for immediate rendering
+      let localHabits = {};
+      let localCompletions = {};
+      let localHours = {};
+      let loadedFromLocalStorage = false;
+
+      if (typeof window !== 'undefined') {
+        try {
+          const savedHabits = localStorage.getItem(`habitsByMonth_${authUser.uid}`);
+          const savedCompletions = localStorage.getItem(`userCompletions_${authUser.uid}`);
+          const savedHours = localStorage.getItem(`productiveHours_${authUser.uid}`);
+          
+          if (savedHabits) {
+            localHabits = JSON.parse(savedHabits);
+            loadedFromLocalStorage = true;
+          }
+          if (savedCompletions) {
+            localCompletions = JSON.parse(savedCompletions);
+          }
+          if (savedHours) {
+            localHours = JSON.parse(savedHours);
+          }
+
+          // If we have localStorage data, set it immediately for fast rendering
+          if (loadedFromLocalStorage) {
+            setHabitsByMonth(localHabits);
+            setCompletions(localCompletions);
+            setProductiveHours(localHours);
+          }
+        } catch (e) {
+          console.error('Error parsing localStorage data:', e);
+        }
+      }
+
+      // Set dataLoaded to true immediately to prevent loading screen
+      // (either we have localStorage data, or we'll show defaults)
+      setDataLoaded(true);
+
+      // Then load from Firestore in the background to ensure sync
       try {
         const db = getFirestoreDb();
         const userHabitsRef = doc(db, 'userHabits', authUser.uid);
@@ -58,31 +133,25 @@ export function HabitsProvider({ children }) {
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          setHabitsByMonth(data.habitsByMonth || {});
-          setCompletions(data.completions || {});
-          setProductiveHours(data.productiveHours || {});
-        } else {
-          // Check if there's data in localStorage to migrate
-          let localHabits = {};
-          let localCompletions = {};
-          let localHours = {};
+          const firestoreHabits = data.habitsByMonth || {};
+          const firestoreCompletions = data.completions || {};
+          const firestoreHours = data.productiveHours || {};
 
+          // Update state with Firestore data (authoritative source)
+          setHabitsByMonth(firestoreHabits);
+          setCompletions(firestoreCompletions);
+          setProductiveHours(firestoreHours);
+
+          // Update localStorage with latest Firestore data
           if (typeof window !== 'undefined') {
-            try {
-              const savedHabits = localStorage.getItem('habitsByMonth');
-              const savedCompletions = localStorage.getItem('userCompletions');
-              const savedHours = localStorage.getItem('productiveHours');
-              
-              if (savedHabits) localHabits = JSON.parse(savedHabits);
-              if (savedCompletions) localCompletions = JSON.parse(savedCompletions);
-              if (savedHours) localHours = JSON.parse(savedHours);
-            } catch (e) {
-              console.error('Error parsing localStorage data:', e);
-            }
+            localStorage.setItem(`habitsByMonth_${authUser.uid}`, JSON.stringify(firestoreHabits));
+            localStorage.setItem(`userCompletions_${authUser.uid}`, JSON.stringify(firestoreCompletions));
+            localStorage.setItem(`productiveHours_${authUser.uid}`, JSON.stringify(firestoreHours));
           }
-
-          // Initialize with localStorage data if available, otherwise 1 habit per month for new users
+        } else {
+          // No Firestore document exists
           let defaultHabitsForNewUser = {};
+          
           if (Object.keys(localHabits).length === 0) {
             // New user - initialize with 1 habit per month
             for (let month = 1; month <= 12; month++) {
@@ -103,18 +172,17 @@ export function HabitsProvider({ children }) {
           setCompletions(initialData.completions);
           setProductiveHours(initialData.productiveHours);
 
-          // Clear localStorage after successful migration
-          if (typeof window !== 'undefined' && Object.keys(localHabits).length > 0) {
-            console.log('✅ Successfully migrated data from localStorage to Firestore');
-            localStorage.removeItem('habitsByMonth');
-            localStorage.removeItem('userCompletions');
-            localStorage.removeItem('productiveHours');
+          // Save to localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(`habitsByMonth_${authUser.uid}`, JSON.stringify(initialData.habitsByMonth));
+            localStorage.setItem(`userCompletions_${authUser.uid}`, JSON.stringify(initialData.completions));
+            localStorage.setItem(`productiveHours_${authUser.uid}`, JSON.stringify(initialData.productiveHours));
           }
         }
-        setDataLoaded(true);
+        // Note: dataLoaded is already set to true earlier for instant rendering
       } catch (error) {
         console.error('Error loading habits data from Firestore:', error);
-        setDataLoaded(true);
+        // dataLoaded is already true, so UI won't be blocked
       }
     };
 
@@ -127,6 +195,15 @@ export function HabitsProvider({ children }) {
 
     const saveToFirestore = async () => {
       try {
+        // Save to localStorage immediately for instant retrieval
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(`habitsByMonth_${authUser.uid}`, JSON.stringify(habitsByMonth));
+          localStorage.setItem(`userCompletions_${authUser.uid}`, JSON.stringify(completions));
+          localStorage.setItem(`productiveHours_${authUser.uid}`, JSON.stringify(productiveHours));
+          console.log('💾 Saved to localStorage cache');
+        }
+
+        // Then save to Firestore (background sync)
         const db = getFirestoreDb();
         const userHabitsRef = doc(db, 'userHabits', authUser.uid);
         
@@ -136,6 +213,7 @@ export function HabitsProvider({ children }) {
           productiveHours,
           updatedAt: new Date()
         });
+        console.log('☁️ Synced to Firestore');
       } catch (error) {
         console.error('Error saving habits data to Firestore:', error);
         // If document doesn't exist, create it
@@ -289,6 +367,7 @@ export function HabitsProvider({ children }) {
     productiveHours,
     updateProductiveHours,
     getProductiveHours,
+    dataLoaded,
   };
 
   return (

@@ -113,7 +113,7 @@ const motivationalReminders = [
 
 export default function SocialHabitTracker() {
   const { user: authUser, loading: authLoading, signOut } = useAuth();
-  const { getHabitsForMonth, toggleCompletion, isCompleted: isHabitCompletedInContext, productiveHours, updateProductiveHours, getProductiveHours, updateHabitName, deleteHabitFromMonth } = useHabits();
+  const { getHabitsForMonth, toggleCompletion, isCompleted: isHabitCompletedInContext, productiveHours, updateProductiveHours, getProductiveHours, updateHabitName, deleteHabitFromMonth, dataLoaded } = useHabits();
   
   // Get current month for habits
   const currentMonthKey = currentDate.substring(0, 7); // "2025-10"
@@ -512,15 +512,6 @@ export default function SocialHabitTracker() {
             {isClient ? `${getCompletionStats().completed}/${getCompletionStats().total}` : '0/0'}
           </div>
         </div>
-        
-        {/* Loading state */}
-        {!isClient && (
-          <div className="py-16 text-center">
-            <div className="text-sm text-[#626c71] dark:text-[rgba(167,169,169,0.7)]">
-              Loading...
-            </div>
-          </div>
-        )}
 
         {/* Desktop Table */}
         {!showEmptyState && isClient && (
