@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -95,6 +95,27 @@ export default function CommunityPage() {
   const [expandedUsers, setExpandedUsers] = useState({});
   // State to track if all tables are expanded
   const [allExpanded, setAllExpanded] = useState(false);
+
+  // Set page metadata on mount
+  useEffect(() => {
+    document.title = 'Community | Camino';
+    
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.name = 'description';
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.content = 'Explore community habit tracking progress. See how others are building consistent habits and get inspired by their daily achievements.';
+    
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = 'https://camino.rknastenka.com/community/';
+  }, []);
 
   // Toggle expanded state for a user
   const toggleUserExpansion = (userName) => {

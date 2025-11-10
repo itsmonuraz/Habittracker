@@ -1,12 +1,13 @@
 {
-  "name": "Camino - Social Habit Tracker",
+  "name": "Camino - Minimal Habit Tracker",
   "short_name": "Camino",
-  "description": "Minimal Social Habit Tracker",
+  "description": "Build better habits with Camino. A minimal, distraction-free habit tracker that syncs across devices. Track daily progress, stay consistent, and achieve your goals.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "orientation": "portrait-primary",
+  "categories": ["productivity", "lifestyle", "health"],
   "icons": [
     {
       "src": "/logo.png",
@@ -15,7 +16,7 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/logo-512.png",
+      "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
