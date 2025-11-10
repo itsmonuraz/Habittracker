@@ -641,52 +641,17 @@ export default function SocialHabitTracker() {
                     className="border-b border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.15)] border-r border-r-[rgba(94,82,64,0.12)] dark:border-r-[rgba(119,124,124,0.15)] min-w-[28px] w-7 sticky top-0 z-10 bg-[#fffffe] dark:bg-[#262828] py-2 relative"
                   >
                     <div className="flex flex-col items-center justify-center h-full gap-1">
-                      {editingHabitIndex === index ? (
-                        <div className="fixed inset-0 bg-black/50 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style={{zIndex: 9999}}>
-                          <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-xl max-w-xs w-full p-4" style={{zIndex: 10000}}>
-                            <label className="block text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-2">
-                              Edit habit name:
-                            </label>
-                            <input
-                              type="text"
-                              value={editingHabitValue}
-                              onChange={handleHabitNameChange}
-                              onKeyDown={(e) => handleHabitNameKeyPress(e, index)}
-                              autoFocus
-                              className="w-full px-3 py-2 bg-white dark:bg-[#1a1a1a] border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] outline-none focus:ring-2 focus:ring-green-600 rounded text-sm text-[#13343b] dark:text-[#f5f5f5]"
-                            />
-                            <div className="flex gap-2 mt-4">
-                              <button
-                                onClick={() => handleHabitNameSave(index)}
-                                className="flex-1 px-4 py-2 bg-green-700 dark:bg-green-800 text-white text-xs rounded-lg hover:bg-green-800 dark:hover:bg-green-900 transition-colors"
-                              >
-                                Save
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setEditingHabitIndex(null);
-                                  setEditingHabitValue('');
-                                }}
-                                className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-[#13343b] dark:text-[#f5f5f5] text-xs rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <span
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            isClient && handleHabitNameClick(index, habit);
-                          }}
-                          onContextMenu={(e) => isClient && handleContextMenu(e, index, habit)}
-                          className={`text-[10px] text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium whitespace-nowrap ${isClient && !authUser || isViewingOthers ? 'cursor-default' : isClient ? 'cursor-text' : ''} rounded px-0.5`}
-                          style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}
-                        >
-                          {habit}
-                        </span>
-                      )}
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          isClient && handleHabitNameClick(index, habit);
+                        }}
+                        onContextMenu={(e) => isClient && handleContextMenu(e, index, habit)}
+                        className={`text-[10px] text-[#626c71] dark:text-[rgba(167,169,169,0.7)] font-medium whitespace-nowrap ${isClient && !authUser || isViewingOthers ? 'cursor-default' : isClient ? 'cursor-text' : ''} rounded px-0.5`}
+                        style={{writingMode: 'vertical-rl', textOrientation: 'mixed'}}
+                      >
+                        {habit}
+                      </span>
                     </div>
                   </th>
                 ))}
@@ -1031,6 +996,42 @@ export default function SocialHabitTracker() {
           >
             delete habit
           </button>
+        </div>
+      )}
+
+      {/* Edit Habit Name Modal - Mobile */}
+      {editingHabitIndex !== null && (
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style={{zIndex: 99999}}>
+          <div className="bg-[#fffffe] dark:bg-[#262828] rounded-xl border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] shadow-xl max-w-xs w-full p-4">
+            <label className="block text-xs text-[#626c71] dark:text-[rgba(167,169,169,0.7)] mb-2">
+              Edit habit name:
+            </label>
+            <input
+              type="text"
+              value={editingHabitValue}
+              onChange={handleHabitNameChange}
+              onKeyDown={(e) => handleHabitNameKeyPress(e, editingHabitIndex)}
+              autoFocus
+              className="w-full px-3 py-2 bg-white dark:bg-[#1a1a1a] border border-[rgba(94,82,64,0.12)] dark:border-[rgba(119,124,124,0.2)] outline-none focus:ring-2 focus:ring-green-600 rounded text-sm text-[#13343b] dark:text-[#f5f5f5]"
+            />
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => handleHabitNameSave(editingHabitIndex)}
+                className="flex-1 px-4 py-2 bg-green-700 dark:bg-green-800 text-white text-xs rounded-lg hover:bg-green-800 dark:hover:bg-green-900 transition-colors"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => {
+                  setEditingHabitIndex(null);
+                  setEditingHabitValue('');
+                }}
+                className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-[#13343b] dark:text-[#f5f5f5] text-xs rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
