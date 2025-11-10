@@ -1,0 +1,26 @@
+{
+  "name": "Camino - Social Habit Tracker",
+  "short_name": "Camino",
+  "description": "Minimal Social Habit Tracker",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color_dark": "#1a1a1a",
+  "background_color_dark": "#0a0a0a"
+}
